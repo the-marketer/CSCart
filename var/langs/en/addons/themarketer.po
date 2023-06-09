@@ -1,0 +1,89 @@
+msgid ""
+msgstr "Project-Id-Version: tygh"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language-Team: English\n"
+"Language: en_US"
+
+msgctxt "Addons::name::themarketer"
+msgid "The Marketer"
+msgstr "The Marketer"
+
+msgctxt "Addons::description::themarketer"
+msgid "Manage The Marketer settings"
+msgstr "Manage The Marketer settings"
+
+msgctxt "Languages::themarketer_settings"
+msgid "TheMarketer settings & feeds"
+msgstr "TheMarketer settings & feeds"
+
+msgctxt "SettingsSections::themarketer::general_settings"
+msgid "General Settings"
+msgstr "General Settings"
+
+msgctxt "SettingsSections::themarketer::themarketer_feeds"
+msgid "Feeds"
+msgstr "Feeds"
+
+msgctxt "SettingsOptions::themarketer::tm_track_key"
+msgid "TheMarketer TRACKING KEY"
+msgstr "TheMarketer TRACKING KEY"
+
+msgctxt "SettingsOptions::themarketer::tm_rest_key"
+msgid "TheMarketer REST KEY"
+msgstr "TheMarketer REST KEY"
+
+msgctxt "SettingsOptions::themarketer::tm_customer_id"
+msgid "TheMarketer CUSTOMER ID"
+msgstr "TheMarketer CUSTOMER ID"
+
+msgctxt "SettingsOptions::themarketer::tm_api_url"
+msgid "TheMarketer API URL"
+msgstr "TheMarketer API URL"
+
+msgctxt "SettingsOptions::themarketer::match_brand"
+msgid "Match Brand"
+msgstr "Match Brand"
+
+msgctxt "SettingsOptions::themarketer::match_size"
+msgid "Match Size"
+msgstr "Match Size"
+
+msgctxt "SettingsOptions::themarketer::match_color"
+msgid "Match Color"
+msgstr "Match Color"
+
+msgctxt "SettingsOptions::themarketer::enable_notifications"
+msgid "Enable Push Notifications"
+msgstr "Enable Push Notifications"
+
+msgctxt "SettingsOptions::themarketer::enable_reviews"
+msgid "Enable Product Reviews Imports"
+msgstr "Enable Product Reviews Imports"
+
+msgctxt "SettingsOptions::themarketer::enable_orders"
+msgid "Enable Orders feed"
+msgstr "Enable Orders feed"
+
+msgctxt "Languages::tm_feed_date_from"
+msgid "Select Orders feed date from"
+msgstr "Select Orders feed date from"
+
+msgctxt "Languages::tm_orders_feed"
+msgid "ORDERS FEED LINK"
+msgstr "ORDERS FEED LINK"
+
+msgctxt "Languages::tm_products_feed"
+msgid "PRODUCTS XML FEED LINK"
+msgstr "PRODUCTS XML FEED LINK"
+
+msgctxt "Languages::tm_products_feed_cron"
+msgid "PRODUCTS XML FEED CRON JOB URL"
+msgstr "PRODUCTS XML FEED CRON JOB URL"
+
+msgctxt "Languages::tm_categories_feed"
+msgid "CATEGORIES XML FEED LINK"
+msgstr "CATEGORIES XML FEED LINK"
+
+msgctxt "Languages::tm_brands_feed"
+msgid "BRANDS XML FEED LINK"
+msgstr "BRANDS XML FEED LINK"
