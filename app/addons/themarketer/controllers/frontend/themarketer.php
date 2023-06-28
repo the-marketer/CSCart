@@ -244,6 +244,7 @@ if ($mode == 'products_feed') {
 					if($product_data['amount'] > 0){ $avail = 1;} else { $avail = 0;}
 					if($product_data['amount'] > 0){ $product_data['amount'] = $product_data['amount'];} else { $product_data['amount'] = 0;}
 					if(!empty($size) || !empty($color)){
+						if($product_data['list_price'] > 0){$product_data['list_price'] = $product_data['list_price'];} else {$product_data['list_price'] = $product_data['price'];}
 						$compination .= '<variation>';
 						$compination .= '<id>'.$product_data['product_code'].'</id>';
 						$compination .= '<sku>'.$product_data['product_code'].'</sku>';
