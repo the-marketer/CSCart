@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<addon scheme="3.0">
+    <id>mktr</id>
+    <name>TheMarketer</name>
+    <description>TheMarketer - Cs-Cart Version</description>
+	<version>1.0</version>
+	<priority>1</priority>
+	<position>1</position>
+	<status>active</status>
+    <has_icon>Y</has_icon>
+	<supplier>Themarketer.com</supplier>
+    <auto_install>MULTIVENDOR,ULTIMATE</auto_install>
+	<default_language>en</default_language>
+    <compatibility>
+        <core_version>
+            <min>4.0.0</min>
+        </core_version>
+    </compatibility>
+    <authors>
+        <author>
+            <name>Themarketer.com</name>
+            <email>info@themarketer.com</email>
+            <url>http://themarketer.com</url>
+        </author>
+    </authors>
+    <queries>
+        <item for="install">
+            CREATE TABLE IF NOT EXISTS `?:mktr` (
+                `uid` varchar(50) NOT NULL,
+                `data` longtext, 
+                `expire` datetime,
+                PRIMARY KEY  (uid)
+            ) Engine=MyISAM DEFAULT CHARSET UTF8;
+        </item>
+        <item for="uninstall">DROP TABLE IF EXISTS ?:mktr;</item>
+    </queries>
+    <functions>
+        <item for="install">fn_mktr_install</item>
+        <item for="uninstall">fn_mktr_uninstall</item>
+    </functions>
+    <settings layout="separate" edition_type="ROOT,STOREFRONT">
+        <sections>
+            <section id="tracker">
+                <items>
+                    <item id="tracker_form">
+                        <type>info</type>
+                        <handler>fn_get_mktr_form</handler>
+                        <variants/>
+                    </item>
+                    <item id="tracker_status">
+                        <type>hidden</type>
+                    </item>
+                    <item id="tracker_settings">
+                        <type>hidden</type>
+                    </item>
+                    <item id="email_status">
+                        <type>hidden</type>
+                    </item>
+                    <item id="google_status">
+                        <type>hidden</type>
+                    </item>
+                    <item id="google_settings">
+                        <type>hidden</type>
+                    </item>
+                </items>
+            </section>
+        </sections>
+   </settings>
+</addon>
