@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<addon scheme="3.0">
+    <id>themarketer</id>
+    <name>(Themarketer.com) The Marketer</name>
+    <description>Manage The Marketer settings</description>
+	<version>1.0</version>
+	<priority>1</priority>
+	<position>110</position>
+	<status>active</status>
+	<supplier>Themarketer.com</supplier>
+	<default_language>en</default_language>
+	<authors>
+        <author>
+            <name>Themarketer.com</name>
+            <email>info@themarketer.com</email>
+            <url>http://themarketer.com</url>
+        </author>
+    </authors>
+    <settings edition_type="ROOT,STOREFRONT">
+        <sections>
+            <section id="general_settings">
+                <items>
+                    <item id="tm_track_key">
+                        <type>input</type>
+                    </item>
+					<item id="tm_rest_key">
+						<type>input</type>
+					</item>
+					<item id="tm_customer_id">
+						<type>input</type>
+					</item>
+                    <item id="match_brand">
+						<type>selectbox</type>
+					</item>
+                    <item id="match_size">
+						<type>selectbox</type>
+					</item>
+                    <item id="match_color">
+						<type>selectbox</type>
+					</item>
+                    <item id="enable_notifications">					
+                        <type>checkbox</type>
+                        <default_value>Y</default_value>
+					</item>
+                    <item id="enable_reviews">
+                        <type>checkbox</type>
+                        <default_value>N</default_value>
+					</item>
+                    <item id="enable_orders">
+                        <type>checkbox</type>
+                        <default_value>Y</default_value>
+					</item>
+                </items>
+            </section>
+			<section id="themarketer_feeds">
+				<items>
+                    <item id="feeds">
+                        <type>template</type>
+                        <default_value>feeds-links.tpl</default_value>
+                    </item>
+				</items>
+			</section>	
+        </sections>	
+    </settings>
+    <queries>
+		<item>
+			CREATE TABLE `?:themarketer_feeds` (
+			  `id` tinyint(1) UNSIGNED NOT NULL AUTO_INCREMENT,
+			  `date_from` int(11) NOT NULL DEFAULT '0',
+			  `orders_feed` varchar(250) NOT NULL DEFAULT '',
+			  `products_feed` varchar(250) NOT NULL DEFAULT '',
+			  `categories_feed` varchar(250) NOT NULL DEFAULT '',
+			  `brands_feed` varchar(250) NOT NULL DEFAULT '',
+               PRIMARY KEY `tmid` (`id`)
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+		</item>
+        <item for="uninstall">DROP TABLE `?:themarketer_feeds`;</item>
+	</queries>
+</addon>
