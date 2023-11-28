@@ -160,6 +160,10 @@ class Route
                 if ($read !== null && $isStatic && self::fileExists($fileName)) {
                     Valid::Output(self::readFile($fileName), null, null, true);
                 } else {
+                    if (in_array($name, ['Orders', 'Feed', 'Brands', 'Category'])) {
+                        @ini_set('memory_limit', '2G');
+                        @ini_set('max_execution_time', '3600');
+                    }
                     $out = $this->{$name}();
                     if (array_key_exists($name, self::$page_tree)) {
                         $tree = self::$page_tree[$name];

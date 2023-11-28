@@ -315,9 +315,20 @@ class Product extends DataBase
             if (!isset($this->data['discount'])) {
                 $this->data['discount'] = 0;
             }
-            $price = isset($this->data['original_price']) ? $this->data['original_price'] : $this->data['base_price'];
+
+            if (isset($this->data['original_price']) && $this->data['original_price'] > 0) {
+                $sale_price = $this->data['original_price'];
+            } else {
+                $sale_price = $this->data['base_price'];
+            }
+            if (isset($this->data['list_price']) && $this->data['list_price'] > 0) {
+                $price = $this->data['list_price'];
+            } else {
+                $price = $sale_price;
+            }
+
             $p['price'] = $this->toDigit($price);
-            $p['sale_price'] = $this->toDigit($price);
+            $p['sale_price'] = $this->toDigit($sale_price);
 
             $p['sale_price'] = $this->getPricesAfterPromo($p['sale_price']);
 
@@ -509,10 +520,19 @@ class Product extends DataBase
     protected function getPricesVarNow($witch = null)
     {
         if ($this->pricesVar === null) {
-            $price = $this->data['base_price'];
+            if (isset($this->data['original_price']) && $this->data['original_price'] > 0) {
+                $sale_price = $this->data['original_price'];
+            } else {
+                $sale_price = $this->data['base_price'];
+            }
+            if (isset($this->data['list_price']) && $this->data['list_price'] > 0) {
+                $price = $this->data['list_price'];
+            } else {
+                $price = $sale_price;
+            }
 
             $p['price'] = $this->toDigit($price);
-            $p['sale_price'] = $this->toDigit($price);
+            $p['sale_price'] = $this->toDigit($sale_price);
 
             $p['sale_price'] = $this->getPricesAfterPromo($p['sale_price']);
 
