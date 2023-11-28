@@ -20,5 +20,7 @@ fn_register_hooks(
     'pre_add_to_wishlist',
     'delete_wishlist_product',
     'newsletters_update_subscriptions_post',
-    'login_user_post'
+    'login_user_post',
+    'api_handle_request',
+    'api_check_access'
 );

@@ -50,7 +50,9 @@ class Session
     public static function getUid()
     {
         if (self::$uid === null) {
-            if (!isset(\Tygh\Tygh::$app['session']['__sm__uid'])) {
+            if (array_key_exists('smuid', $_GET) && !empty($_GET['smuid'])) {
+                self::$uid = $_GET['smuid'];
+            } elseif (!isset(\Tygh\Tygh::$app['session']['__sm__uid'])) {
                 self::$uid = uniqid();
                 \Tygh\Tygh::$app['session']['__sm__uid'] = self::$uid;
             } else {

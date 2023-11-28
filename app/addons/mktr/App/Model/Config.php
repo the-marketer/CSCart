@@ -368,18 +368,18 @@ importScripts("https://t.themarketer.com/firebase.js");';
         return unserialize($value);
         // return unserialize(base64_decode($value));
     }
-/*
-    public function asString($name)
-    {
-        $value = $this->{$name};
+    /*
+        public function asString($name)
+        {
+            $value = $this->{$name};
 
-        if (self::CONFIG_DATA[$name]['type'] === 'array' && $value !== null) {
-            $value = implode('|', (array) $value);
+            if (self::CONFIG_DATA[$name]['type'] === 'array' && $value !== null) {
+                $value = implode('|', (array) $value);
+            }
+
+            return $value;
         }
-
-        return $value;
-    }
-*/
+    */
 
     private function getSeo()
     {

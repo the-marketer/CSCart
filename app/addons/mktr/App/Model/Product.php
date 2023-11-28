@@ -532,9 +532,9 @@ class Product extends DataBase
             foreach ($this->data['promotions'] as $k => $v) {
                 foreach ($v['bonuses'] as $k1 => $v1) {
                     if ($v1['discount_bonus'] == 'by_percentage') {
-                        $price = $price - ($price * ($v1['discount_value'] / 100));
+                        $price -= ($price * ($v1['discount_value'] / 100));
                     } else {
-                        $price = $price - $v1['discount_value'];
+                        $price -= $v1['discount_value'];
                     }
                 }
             }
@@ -636,10 +636,10 @@ class Product extends DataBase
 
                     if ($val0['modifier'] != 0) {
                         if ($val0['modifier_type'] == 'A') {
-                            $newVariation['price'] = $newVariation['price'] + $val0['modifier'];
+                            $newVariation['price'] += $val0['modifier'];
                             $newVariation['sale_price'] = $this->getPricesAfterPromo($newVariation['price']);
                         } else {
-                            $newVariation['price'] = $newVariation['price'] + ($newVariation['price'] * ($val0['modifier'] / 100));
+                            $newVariation['price'] += ($newVariation['price'] * ($val0['modifier'] / 100));
                             $newVariation['sale_price'] = $this->getPricesAfterPromo($newVariation['price']);
                         }
                     }
@@ -710,35 +710,35 @@ class Product extends DataBase
         return null;
     }
 
-/*
-    public static function getVariant($id) {
-        $variants = self::getVariation();
-        $found = array_search($id, Config::searchIn($variants, 'id'));
-        return isset($variants[$found]) ? $variants[$found] : null;
-    }
-    protected function getVariantData($id = null)
-    {
-        if (!array_key_exists($id, $this->variant)) {
-            $combinations = [
-                'id' => $this->id,
-                'sku' => $this->sku,
-            ];
+    /*
+        public static function getVariant($id) {
+            $variants = self::getVariation();
+            $found = array_search($id, Config::searchIn($variants, 'id'));
+            return isset($variants[$found]) ? $variants[$found] : null;
+        }
+        protected function getVariantData($id = null)
+        {
+            if (!array_key_exists($id, $this->variant)) {
+                $combinations = [
+                    'id' => $this->id,
+                    'sku' => $this->sku,
+                ];
 
-            if ($this->isCombination()) {
-                // $this->getVariation();
-                foreach ($combination as $val) {
-                    $combinations['id'] .= '_' . $val['id_attribute'];
-                    $combinations['sku'] .= '_' . $val['attribute_name'];
+                if ($this->isCombination()) {
+                    // $this->getVariation();
+                    foreach ($combination as $val) {
+                        $combinations['id'] .= '_' . $val['id_attribute'];
+                        $combinations['sku'] .= '_' . $val['attribute_name'];
+                    }
                 }
+
+                $this->variant[$id] = $combinations;
             }
 
-            $this->variant[$id] = $combinations;
+            return $this->variant[$id];
         }
 
-        return $this->variant[$id];
-    }
-
-*/
+    */
 
     protected function toFeed()
     {

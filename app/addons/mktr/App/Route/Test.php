@@ -41,6 +41,7 @@ class Test
         // \Mktr\Helper\Session::clear();
         // \Mktr\Helper\Session::save();
         dd(\Mktr\Helper\Session::get('Alex'), \Mktr\Helper\Session::getUid());
+
         // \Mktr\Helper\Session::
         // \Mktr\Model\Subscription::getByEmail('admin@eax.ro');
         // \Mktr\Model\Orders::getByID(100)->toEvent(true);

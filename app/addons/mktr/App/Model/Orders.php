@@ -281,7 +281,7 @@ class Orders extends DataBase
         if (!empty($this->data['taxes'])) {
             $tax = 0;
             foreach ($this->data['taxes'] as $key => $value) {
-                $tax = $tax + $value['tax_subtotal'];
+                $tax += $value['tax_subtotal'];
             }
 
             return $tax;
@@ -295,9 +295,9 @@ class Orders extends DataBase
         foreach ($promo as $k => $v) {
             foreach ($v['bonuses'] as $k1 => $v1) {
                 if ($v1['discount_bonus'] == 'by_percentage') {
-                    $price = $price - ($price * ($v1['discount_value'] / 100));
+                    $price -= ($price * ($v1['discount_value'] / 100));
                 } else {
-                    $price = $price - $v1['discount_value'];
+                    $price -= $v1['discount_value'];
                 }
             }
         }
@@ -339,7 +339,10 @@ class Orders extends DataBase
             */
             // $products[$i]['price'] = $this->toDigit($p['amount'] * $tmp['sale_price']);
             // $products[$i]['sale_price'] = $this->toDigit($tmp['sale_price']);
-            $products[$i]['price'] = $this->toDigit($p['amount'] * $promoPrice);
+
+            // $products[$i]['price'] = $this->toDigit($p['amount'] * $promoPrice);
+
+            $products[$i]['price'] = $this->toDigit($p['original_price']);
             $products[$i]['sale_price'] = $this->toDigit($promoPrice);
 
             $newVariation = [
@@ -379,7 +382,9 @@ class Orders extends DataBase
             $products[$i]['product_id'] = $pp->id;
             $products[$i]['quantity'] = $p['amount'];
 
-            $products[$i]['price'] = $p['amount'] * $p['original_price'];
+            // $products[$i]['price'] = $p['amount'] * $p['original_price'];
+
+            $products[$i]['price'] = $p['original_price'];
 
             $newVariation = ['sku' => [$pp->sku]];
 

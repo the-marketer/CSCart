@@ -38,6 +38,8 @@ class Mktr
     private static $i = null;
     private static $included = [];
     public static $auth = null;
+    public static $isApi = false;
+    public static $ApiPath = null;
 
     public function __construct()
     {
@@ -71,6 +73,61 @@ class Mktr
                     self::$included[$className] = false;
                 }
             }
+        } elseif (Mktr::$isApi && strpos($className, '\\' . Mktr::$ApiPath)) {
+            /*
+            \\Mktr\\Route\\".Mktr::$ApiPath."::run()
+            \\Mktr\\Helper\\Route::initContent('".Mktr::$ApiPath."')\\Mktr\\Route\\".Mktr::$ApiPath."::run()
+            */
+            $classCode = "namespace Tygh\Api\Entities;
+
+            use Tygh\Api\AEntity;
+            use Tygh\Api\Response;
+            
+            class " . Mktr::$ApiPath . " extends AEntity
+            {
+                public function index(\$id = '', \$params = array())
+                {
+                    return array(
+                        'status' => Response::STATUS_OK,
+                        'data' => \\Mktr\\Helper\\Route::initContent('" . Mktr::$ApiPath . "')
+                    );
+                }
+            
+                public function create(\$params)
+                {
+                    return array(
+                        'status' => Response::STATUS_CREATED,
+                        'data' => array()
+                    );
+                }
+            
+                public function update(\$id, \$params)
+                {
+                    return array(
+                        'status' => Response::STATUS_OK,
+                        'data' => array()
+                    );
+                }
+            
+                public function delete(\$id)
+                {
+                    return array(
+                        'status' => Response::STATUS_NO_CONTENT,
+                    );
+                }
+            
+                public function privileges()
+                {
+                    return array(
+                        'create' => 'create_things',
+                        'update' => 'edit_things',
+                        'delete' => 'delete_things',
+                        'index'  => 'view_things'
+                    );
+                }
+            }";
+
+            eval($classCode);
         }
     }
 
@@ -108,7 +165,23 @@ function fn_mktr_get_route(&$req, &$result, &$area, &$is_allowed_url)
         $is_allowed_url = 1;
     }
 }
-
+function fn_mktr_api_handle_request($CSCart = null, &$status = null)
+{
+    if ($CSCart !== null) {
+        if (array_key_exists('REQUEST_URI', $_SERVER) && preg_match('/mktr\/api\/([^\/?]+)/', $_SERVER['REQUEST_URI'], $matches)) {
+            $status = true;
+            Mktr::i();
+            Mktr::$isApi = true;
+            Mktr::$ApiPath = $matches[1];
+        }
+    }
+}
+function fn_mktr_api_check_access($CSCart = null, $entity = null, $method_name = null, &$can_access = null)
+{
+    if ($CSCart !== null && Mktr::$isApi) {
+        $can_access = true;
+    }
+}
 function fn_mktr_install()
 {
     Mktr::i();
