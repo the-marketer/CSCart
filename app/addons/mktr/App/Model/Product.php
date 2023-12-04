@@ -479,7 +479,7 @@ class Product extends DataBase
                         // $list = $this->product_features;
                         $this->optionList[1] = 'feature_id';
 
-                        if ($this->getDefault !== null) {
+                        if ($this->getDefault !== null && isset($val['variant_id'])) {
                             $this->getDefault[$val['feature_id']] = $val['variant_id'];
                         }
                     }
@@ -638,7 +638,6 @@ class Product extends DataBase
                     'size' => null,
                     'color' => null,
                 ];
-
                 foreach ($val as $val0) {
                     $id = $val0['option_id'];
                     $name = $val0['variant_name'];
@@ -657,10 +656,10 @@ class Product extends DataBase
                     if ($val0['modifier'] != 0) {
                         if ($val0['modifier_type'] == 'A') {
                             $newVariation['price'] += $val0['modifier'];
-                            $newVariation['sale_price'] = $this->getPricesAfterPromo($newVariation['price']);
+                            $newVariation['sale_price'] += $val0['modifier'];
                         } else {
                             $newVariation['price'] += ($newVariation['price'] * ($val0['modifier'] / 100));
-                            $newVariation['sale_price'] = $this->getPricesAfterPromo($newVariation['price']);
+                            $newVariation['sale_price'] += ($newVariation['sale_price'] * ($val0['modifier'] / 100));
                         }
                     }
 
@@ -670,6 +669,7 @@ class Product extends DataBase
                         $newVariation['stock'] = min($newVariation['stock'], $this->amount);
                     }
                 }
+                $newVariation['sale_price'] = $this->getPricesAfterPromo($newVariation['sale_price']);
 
                 $newVariation['id'] = str_replace(' ', '_', implode('_', $newVariation['id']));
                 $newVariation['sku'] = str_replace(' ', '_', implode('_', $newVariation['sku']));
@@ -690,6 +690,7 @@ class Product extends DataBase
             $this->data['byID'] = $byID;
             $this->var = $variation;
         }
+
         if (!empty($this->var)) {
             return ['variation' => $this->var];
         }
