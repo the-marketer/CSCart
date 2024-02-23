@@ -1,2 +1,4 @@
 
 .DS_Store
+app/addons/mktr/Storage/*
+!app/addons/mktr/Storage/.gitkeep

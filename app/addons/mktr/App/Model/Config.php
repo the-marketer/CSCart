@@ -170,7 +170,7 @@ importScripts("https://t.themarketer.com/firebase.js");';
         if (method_exists($this, $name)) {
             return call_user_func_array([$this, $name], $arguments);
         } else {
-            if (DEVELOPMENT) {
+            if (MKTR_DEV) {
                 throw new \Exception("Method {$name} does not exist.");
             }
 
@@ -183,7 +183,7 @@ importScripts("https://t.themarketer.com/firebase.js");';
         if (method_exists(self::i(), $name)) {
             return call_user_func_array([self::$i, $name], $arguments);
         } else {
-            if (DEVELOPMENT) {
+            if (MKTR_DEV) {
                 throw new \Exception("Static method {$name} does not exist.");
             }
 

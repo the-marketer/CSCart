@@ -17,7 +17,12 @@ if (!defined('MKTR_ROOT')) {
 if (!defined('MKTR_APP')) {
     define('MKTR_APP', __DIR__ . (substr(__DIR__, -1) === '/' ? '' : '/'));
 }
-
+if (!defined('MKTR_DEV')) {
+    define('MKTR_DEV', defined('DEVELOPMENT') ? DEVELOPMENT : false);
+}
+if (!defined('MKTR_CRON')) {
+    define('MKTR_CRON', false);
+}
 if (!function_exists('function_name')) {
     function dd()
     {
@@ -136,7 +141,7 @@ class Mktr
         if (method_exists($this, $name)) {
             return call_user_func_array([$this, $name], $arguments);
         } else {
-            if (DEVELOPMENT) {
+            if (MKTR_DEV) {
                 throw new \Exception("Method {$name} does not exist.");
             }
 
@@ -149,7 +154,7 @@ class Mktr
         if (method_exists(self::i(), $name)) {
             return call_user_func_array([self::$i, $name], $arguments);
         } else {
-            if (DEVELOPMENT) {
+            if (MKTR_DEV) {
                 throw new \Exception("Static method {$name} does not exist.");
             }
 

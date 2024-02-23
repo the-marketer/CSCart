@@ -15,24 +15,35 @@ class Cron
     public static function run()
     {
         $out = [];
-        $pro = \Mktr\Model\Config::db()->query('SELECT * FROM ?:storefronts');
-        foreach ($pro->fetch_all(MYSQLI_ASSOC) as $store) {
-            foreach ($store as $k => $v) {
-                \Tygh\Tygh::$app['storefront']->{$k} = $v;
+        if (fn_allowed_for('MULTIVENDOR')) {
+            try {
+                $pro = \Mktr\Model\Config::db()->query('SELECT * FROM ?:storefronts');
+                $stores = $pro->fetch_all(MYSQLI_ASSOC);
+            } catch (\Exception $e) {
+                $stores = [false];
             }
-
-            foreach (['http_host', 'https_host', 'current_host'] as $v) {
-                \Tygh\Registry::set('runtime.' . $v, $store['url']);
+        } else {
+            $stores = [false];
+        }
+        foreach ($stores as $store) {
+            if ($store !== false) {
+                foreach ($store as $k => $v) {
+                    \Tygh\Tygh::$app['storefront']->{$k} = $v;
+                }
+                foreach (['http_host', 'https_host', 'current_host'] as $v) {
+                    \Tygh\Registry::set('runtime.' . $v, $store['url']);
+                }
+                foreach (['http_location', 'origin_http_location'] as $v) {
+                    \Tygh\Registry::set('runtime.' . $v, 'http://' . $store['url']);
+                }
+                foreach (['https_location', 'origin_https_location', 'current_location'] as $v) {
+                    \Tygh\Registry::set('runtime.' . $v, 'https://' . $store['url']);
+                }
+                $_REQUEST['storefront_id'] = $store['storefront_id'];
+                \Tygh\Registry::set('runtime.storefront_id', $store['storefront_id']);
+            } else {
+                $store['storefront_id'] = 0;
             }
-            foreach (['http_location', 'origin_http_location'] as $v) {
-                \Tygh\Registry::set('runtime.' . $v, 'http://' . $store['url']);
-            }
-            foreach (['https_location', 'origin_https_location', 'current_location'] as $v) {
-                \Tygh\Registry::set('runtime.' . $v, 'https://' . $store['url']);
-            }
-            $_REQUEST['storefront_id'] = $store['storefront_id'];
-            \Tygh\Registry::set('runtime.storefront_id', $store['storefront_id']);
-            // \Mktr\Model\Config::setShop($store['storefront_id']);
             $c = \Mktr\Model\Config::i(true);
 
             if (\Mktr\Model\Config::showJS()) {
@@ -58,11 +69,6 @@ class Cron
 
                     $data->update_feed = strtotime('+' . (empty($add) ? 4 : $add) . ' hour');
                 }
-                /*
-                else {
-                    $out[] = [ 'NoRun', $store['storefront_id'], \Mktr\Model\Config::shop(), $_REQUEST['storefront_id'] ];
-                }*/
-
                 if ($c->cron_review && $upReview < time()) {
                     \Mktr\Route\Reviews::execute();
 
@@ -71,6 +77,5 @@ class Cron
                 $data->save();
             }
         }
-        // var_dump($out);
     }
 }

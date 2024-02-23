@@ -34,6 +34,9 @@ class Route
         'feed' => [
             'key' => 'Required|Key',
         ],
+        'cron' => [
+            'key' => 'Required|Key',
+        ],
         'brands' => [
             'key' => 'Required|Key',
         ],
@@ -100,7 +103,7 @@ class Route
         } elseif (method_exists($this, $name)) {
             return call_user_func_array([$this, $name], $arguments);
         } else {
-            if (DEVELOPMENT) {
+            if (MKTR_DEV) {
                 throw new \Exception("Method {$name} does not exist.");
             }
 
@@ -117,7 +120,7 @@ class Route
         if (method_exists(self::$init, $name)) {
             return call_user_func_array([self::$init, $name], $arguments);
         } else {
-            if (DEVELOPMENT) {
+            if (MKTR_DEV) {
                 throw new \Exception("Static method {$name} does not exist.");
             }
 
@@ -131,12 +134,12 @@ class Route
 
         if (array_key_exists($name, self::$page_mime)) {
             $mime = Valid::getParam('mime-type', self::$page_mime[$name]);
-
-            if (array_key_exists($name, self::$check)) {
-                Valid::check(self::$check[$name])->status();
+            if (!MKTR_CRON) {
+                if (array_key_exists($name, self::$check)) {
+                    Valid::check(self::$check[$name])->status();
+                }
             }
-
-            if (Valid::status()) {
+            if (MKTR_CRON || Valid::status()) {
                 $isStatic = in_array($name, self::$isStatic);
                 $file = Valid::getParam('file');
                 $read = null;
@@ -160,7 +163,7 @@ class Route
                 if ($read !== null && $isStatic && self::fileExists($fileName)) {
                     Valid::Output(self::readFile($fileName), null, null, true);
                 } else {
-                    if (in_array($name, ['Orders', 'Feed', 'Brands', 'Category'])) {
+                    if (!MKTR_CRON && in_array($name, ['Orders', 'Feed', 'Brands', 'Category', 'Cron'])) {
                         @ini_set('memory_limit', '2G');
                         @ini_set('max_execution_time', '3600');
                     }

@@ -61,14 +61,14 @@ window.mktr.eventsName = {
 window.mktr.buildEvent = function (name = null, data = {}) {
 if (data === null) { data = {}; }
 if (name !== null && window.mktr.eventsName.hasOwnProperty(name)) { data.event = window.mktr.eventsName[name]; }
-' . (DEVELOPMENT ? 'if (!window.mktr.eventsName.hasOwnProperty(name)){ data.event = name; data.type = "notListed"; }' : '') . '
+' . (MKTR_DEV ? 'if (!window.mktr.eventsName.hasOwnProperty(name)){ data.event = name; data.type = "notListed"; }' : '') . '
 if (typeof dataLayer != "undefined" && data.event != "undefined" && window.mktr.ready) {
-dataLayer.push(data);' . (DEVELOPMENT ? ' window.mktr.debug();' : '') . '
+dataLayer.push(data);' . (MKTR_DEV ? ' window.mktr.debug();' : '') . '
 } else { window.mktr.pending.push(data); setTimeout(window.mktr.retry, 1000); } }
 
 window.mktr.retry = function () {
 if (typeof dataLayer != "undefined" && window.mktr.ready) {
-for (let data of window.mktr.pending) { if (data.event != "undefined") { dataLayer.push(data);' . (DEVELOPMENT ? ' window.mktr.debug();' : '') . ' } }        
+for (let data of window.mktr.pending) { if (data.event != "undefined") { dataLayer.push(data);' . (MKTR_DEV ? ' window.mktr.debug();' : '') . ' } }        
 } else if (window.mktr.retryCount < 6) { window.mktr.retryCount++; setTimeout(window.mktr.retry, 1000); }
 };
 
@@ -80,7 +80,7 @@ for (let i of data) { window.mktr.buildEvent(i[0],i[1]); }
 
 window.mktr.toCheck = function (data, d = null) {
 if (data != null && window.mktr.loading) {
-' . (DEVELOPMENT ? ' console.log("mktr_data", data, d);' : '') . '
+' . (MKTR_DEV ? ' console.log("mktr_data", data, d);' : '') . '
 if (data.search("cart") != -1 || data.search("cos") != -1 || data.search("wishlist") != -1 &&
     data.search("getAllWishlist") == -1 || d !== null && typeof d == "string" && d.search("cart") != -1) {
     window.mktr.loading = false;
@@ -177,7 +177,7 @@ $.ceEvent("on", "ce.ajaxdone", function (elms, scripts, params, responseData, re
         }
     }
     $events[] = '};';
-    if (empty($conf->selectors)) {
+    if (!empty($conf->selectors)) {
         $events[] = '$("' . $conf->selectors . '").on("click", window.mktr.loadEvents);';
     }
     $events[] = '(typeof window.mktr.buildEvent != "function") ? document.addEventListener("mktr_loaded", function () { window.mktr.run(); }) : window.mktr.run();';

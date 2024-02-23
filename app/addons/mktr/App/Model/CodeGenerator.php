@@ -31,7 +31,7 @@ class CodeGenerator
         if (method_exists($this, $name)) {
             return call_user_func_array([$this, $name], $arguments);
         } else {
-            if (DEVELOPMENT) {
+            if (MKTR_DEV) {
                 throw new \Exception("Method {$name} does not exist.");
             }
 
@@ -44,7 +44,7 @@ class CodeGenerator
         if (method_exists($i, $name)) {
             return call_user_func_array([$i, $name], $arguments);
         } else {
-            if (DEVELOPMENT) {
+            if (MKTR_DEV) {
                 throw new \Exception("Static method {$name} does not exist.");
             }
 
