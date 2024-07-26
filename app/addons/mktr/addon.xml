@@ -38,13 +38,13 @@
         <item for="install">fn_mktr_install</item>
         <item for="uninstall">fn_mktr_uninstall</item>
     </functions>
-    <settings layout="separate" edition_type="ROOT,STOREFRONT">
+    <settings layout="separate" edition_type="ROOT,STOREFRONT,ULT:VENDOR">
         <sections>
             <section id="tracker">
                 <items>
                     <item id="tracker_form">
                         <type>info</type>
-                        <handler>fn_get_mktr_form</handler>
+                        <handler>fn_get_mktr_tracker_form</handler>
                         <variants/>
                     </item>
                     <item id="tracker_status">
@@ -55,6 +55,15 @@
                     </item>
                     <item id="email_status">
                         <type>hidden</type>
+                    </item>
+                </items>
+            </section>
+            <section id="google">
+                <items>
+                    <item id="google_form">
+                        <type>info</type>
+                        <handler>fn_get_mktr_google_form</handler>
+                        <variants/>
                     </item>
                     <item id="google_status">
                         <type>hidden</type>

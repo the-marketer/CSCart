@@ -9,15 +9,15 @@
  **/
 $schema['central']['marketing']['items']['mktr'] = [
     'attrs' => ['class' => 'is-addon'],
-    'href' => 'mktr',
+    'href' => 'addons.update&addon=mktr&selected_sub_section=tracker&selected_section=settings',
     'position' => 1,
     'subitems' => [
         'mktr_tracker' => [
-            'href' => 'mktr.tracker',
+            'href' => 'addons.update&addon=mktr&selected_sub_section=tracker&selected_section=settings',
             'position' => 1,
         ],
         'mktr_google' => [
-            'href' => 'mktr.google',
+            'href' => 'addons.update&addon=mktr&selected_sub_section=google&selected_section=settings',
             'position' => 1,
         ],
     ],

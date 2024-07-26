@@ -8,6 +8,13 @@
  * @docs        https://themarketer.com/resources/api
  **/
 defined('BOOTSTRAP') or exit('Access denied');
+
+if (isset($_REQUEST['debug'])) {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+}
+
 if (in_array($_SERVER['REQUEST_METHOD'], ['POST', 'GET']) && $mode === 'update' && $_REQUEST['addon'] === 'mktr') {
     Mktr::i();
     Mktr\Helper\Admin::postData();

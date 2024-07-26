@@ -79,7 +79,7 @@ for (let i of data) { window.mktr.buildEvent(i[0],i[1]); }
 };
 
 window.mktr.toCheck = function (data, d = null) {
-if (data != null && window.mktr.loading) {
+if (data != null && typeof data.search == "function" && window.mktr.loading) { 
 ' . (MKTR_DEV ? ' console.log("mktr_data", data, d);' : '') . '
 if (data.search("cart") != -1 || data.search("cos") != -1 || data.search("wishlist") != -1 &&
     data.search("getAllWishlist") == -1 || d !== null && typeof d == "string" && d.search("cart") != -1) {
@@ -100,7 +100,9 @@ $.ceEvent("on", "ce.ajaxdone", function (elms, scripts, params, responseData, re
     // console.log("EAX", scripts, params);
     if (typeof params != "undefined" &&
         typeof params.data != "undefined" &&
+        params.data.result_ids != null &&
         typeof params.data.result_ids != "undefined" &&
+        typeof params.data.result_ids.search == "function" &&
         params.data.result_ids.search("cart_status") != -1
     ) { window.mktr.loading = false; setTimeout(window.mktr.loadEvents, 1000); }
 });

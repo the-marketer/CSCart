@@ -108,7 +108,17 @@ class Admin
     {
         if ($_SERVER['REQUEST_METHOD'] === 'GET' && $mode === 'update' && $_REQUEST['addon'] === 'mktr') {
             $this->rq();
-
+            $tabs = [
+                'settings' => [
+                    'title' => 'Settings',
+                    'js' => true,
+                ],
+                'detailed' => [
+                    'title' => 'General',
+                    'js' => true,
+                ],
+            ];
+/*
             if (self::$page === 'tracker') {
                 $tabs = [
                     'settings' => [
@@ -140,6 +150,7 @@ class Admin
                     ],
                 ];
             }
+*/
             if (self::$config->shop() !== 0) {
                 $tabs['reset'] = [
                     'title' => 'Reset to Main',
@@ -322,9 +333,18 @@ class Admin
 <label class="eswitch-btn" for="eswitch_' . $name . '" ></label>';
     }
 
-    private function form()
+    private function form($p = null)
     {
         $this->rq();
+        $add = false;
+
+        if ($p !== null) {
+            if ($_REQUEST['selected_sub_section'] === $p) {
+                $add = true;
+            }
+            self::$page = $p;
+        }
+
         $out = '<style>#mktr .eswitch,#mktr .eswitch *,#mktr .eswitch :after,#mktr .eswitch :before,#mktr .eswitch:after,#mktr .eswitch:before{box-sizing:border-box}#mktr a,#mktr a[type=button]{cursor:pointer;float:right}#mktr{margin:0 5%}#mktr .eswitch{display:none!important}#mktr .eswitch:after::selection{background:0 0}#mktr .eswitch:before::selection{background:0 0}#mktr .eswitch :after::selection{background:0 0}#mktr .eswitch :before::selection{background:0 0}#mktr .eswitch ::selection{background:0 0}#mktr .eswitch+.eswitch-btn{box-sizing:border-box;outline:0;display:block;width:7em;height:32px;position:relative;cursor:pointer;user-select:none}#mktr .row1::after,#mktr a,#mktr select{width:100%!important}#mktr .eswitch+.eswitch-btn::selection{background:0 0}#mktr .eswitch+.eswitch-btn:after{position:relative;display:block;content:"";width:50%;height:100%;left:0}#mktr .eswitch+.eswitch-btn:before{position:relative;content:"";width:50%;height:100%;display:none}#mktr .eswitch-flip+.eswitch-btn:after,#mktr .eswitch-flip+.eswitch-btn:before{transition:.4s;width:100%;text-align:center;line-height:32px;font-weight:700;position:absolute;top:0;backface-visibility:hidden;border-radius:4px;color:#fff}#mktr .eswitch::selection{background:0 0}#mktr .eswitch:checked+.eswitch-btn:after{left:50%}#mktr .eswitch-flip+.eswitch-btn{padding:2px;transition:.2s;font-family:sans-serif;perspective:100px}#mktr .eswitch-flip+.eswitch-btn:after{display:inline-block;left:0;content:"ON";background:#02c66f;transform:rotateY(-180deg)}#mktr .eswitch-flip+.eswitch-btn:before{display:inline-block;left:0;background:#ff3a19;content:"OFF"}#mktr .eswitch-flip+.eswitch-btn:active:before{transform:rotateY(-20deg)}#mktr .eswitch-flip:checked+.eswitch-btn:before{transform:rotateY(180deg)}#mktr .eswitch-flip:checked+.eswitch-btn:after{transform:rotateY(0);left:0;background:#7fc6a6}#mktr .eswitch-flip:checked+.eswitch-btn:active:after{transform:rotateY(20deg)}#mktr select{padding:0 12px;border:1px solid #ccc;border-radius:4px;resize:vertical;max-width:100%!important}#mktr input[type=text],#mktr textarea{width:100%!important;padding:12px;border:1px solid #ccc;border-radius:4px;resize:vertical;max-width:100%!important}#mktr label{padding:12px 12px 12px 0;display:inline-block}#mktr a[type=button]{background-color:#0489cc;color:#fff;padding:12px 20px;border:none;border-radius:4px}#mktr a[type=button]:hover{background-color:#f4f3f3;color:#000}#mktr .col-25{float:left;width:25%;margin-top:6px}#mktr .col-75{float:left;width:75%;margin-top:10px}#mktr .row1::after{content:"";display:table;clear:both}@media screen and (max-width:600px){#mktr .col-25,#mktr .col-75,#mktr a,#mktr a[type=button]{width:100%!important;margin-top:0}}</style>
     <div id="mktr">
         <input type="hidden" name="mktr_update" value="' . self::$page . '">';
@@ -335,6 +355,9 @@ class Admin
     </div>
     </div>
     ';
+        if ($add) {
+            $out .= '<script type="text/javascript"> setTimeout(function() { document.querySelector(".cm-js#mktr_' . self::$page . '").click(); }, 1000); </script>';
+        }
 
         return $out;
     }

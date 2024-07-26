@@ -198,12 +198,25 @@ function fn_mktr_uninstall()
     Mktr::i();
     Mktr\Helper\Admin::uninstall();
 }
-
 function fn_get_mktr_form()
 {
     Mktr::i();
 
     return Mktr\Helper\Admin::form();
+}
+
+function fn_get_mktr_tracker_form()
+{
+    Mktr::i();
+
+    return Mktr\Helper\Admin::form('tracker');
+}
+
+function fn_get_mktr_google_form()
+{
+    Mktr::i();
+
+    return Mktr\Helper\Admin::form('google');
 }
 
 function fn_mktr_change_order_status(&$nStatus = null, &$fStatus = null, &$order = null)
@@ -305,6 +318,16 @@ function fn_mktr_login_user_post($user_id, $cu_id, $udata, $auth, $condition, $r
 
         \Mktr\Helper\Session::save();
     }
+}
+
+function fn_is_tab_mktr_tracker_available()
+{
+    return true;
+}
+
+function fn_is_tab_mktr_google_available()
+{
+    return true;
 }
 
 if (AREA !== 'A') {

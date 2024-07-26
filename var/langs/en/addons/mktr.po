@@ -32,7 +32,6 @@ msgctxt "Languages::mktr_google"
 msgid "The Marketer - Google"
 msgstr "The Marketer - Google"
 
-
 msgctxt "SettingsSections::mktr::tracker"
 msgid "Tracker Settings"
 msgstr "Tracker Settings"
