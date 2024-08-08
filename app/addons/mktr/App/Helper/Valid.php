@@ -15,7 +15,8 @@ use Mktr\Model\Config;
 class Valid
 {
     const mime = [
-        'xml' => 'application/xhtml+xml',
+        'xml' => 'text/xml',
+        // 'xml' => 'application/xhtml+xml',
         'js' => 'application/javascript',
         'json' => 'application/json',
         'csv' => 'text/csv',
@@ -225,7 +226,7 @@ class Valid
                     } catch (\DOMException $e) {
                         self::$getOut = Array2XML::errors();
                     }
-                break;
+                    break;
                 case 'json':
                     if ($data1 !== null) {
                         $data = [$data => $data1];

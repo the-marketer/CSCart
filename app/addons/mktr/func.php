@@ -23,6 +23,9 @@ if (!defined('MKTR_DEV')) {
 if (!defined('MKTR_CRON')) {
     define('MKTR_CRON', false);
 }
+if (!defined('MKTR_VERSION')) {
+    define('MKTR_VERSION', 'v1.0.3');
+}
 if (!function_exists('function_name')) {
     function dd()
     {
@@ -198,6 +201,7 @@ function fn_mktr_uninstall()
     Mktr::i();
     Mktr\Helper\Admin::uninstall();
 }
+
 function fn_get_mktr_form()
 {
     Mktr::i();

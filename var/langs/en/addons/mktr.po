@@ -1,5 +1,5 @@
 msgid ""
-msgstr "Project-Id-Version: tygh\n"
+msgstr "Project-Id-Version: tygh"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Language-Team: English\n"
 "Language: en_US"
@@ -12,23 +12,23 @@ msgctxt "Addons::description::mktr"
 msgid "The Marketer - CS-Cart Version"
 msgstr "The Marketer - CS-Cart Version"
 
-msgctxt "Languages::mktr"
+msgctxt "Languages::mktr::mktr"
 msgid "The Marketer"
 msgstr "The Marketer"
 
-msgctxt "Languages::mktr_settings"
+msgctxt "Languages::mktr::mktr_settings"
 msgid "The Marketer Settings"
 msgstr "The Marketer Settings"
 
-msgctxt "Languages::mktr_menu_description"
+msgctxt "Languages::mktr::mktr_menu_description"
 msgid "The Marketer - CS-Cart Version"
 msgstr "The Marketer - CS-Cart Version"
 
-msgctxt "Languages::mktr_tracker"
+msgctxt "Languages::mktr::mktr_tracker"
 msgid "The Marketer - Tracker"
 msgstr "The Marketer - Tracker"
 
-msgctxt "Languages::mktr_google"
+msgctxt "Languages::mktr::mktr_google"
 msgid "The Marketer - Google"
 msgstr "The Marketer - Google"
 
@@ -41,9 +41,9 @@ msgid "Google Settings"
 msgstr "Google Settings"
 
 msgctxt "SettingsOptions::mktr::tracker_status_description"
-msgid ""
+msgid "tracker_status"
 msgstr ""
 
 msgctxt "SettingsOptions::mktr::google_status_description"
-msgid ""
+msgid "google_status"
 msgstr ""

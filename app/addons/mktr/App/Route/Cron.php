@@ -18,7 +18,12 @@ class Cron
         if (fn_allowed_for('MULTIVENDOR')) {
             try {
                 $pro = \Mktr\Model\Config::db()->query('SELECT * FROM ?:storefronts');
-                $stores = $pro->fetch_all(MYSQLI_ASSOC);
+
+                if (PRODUCT_VERSION > '4.10.1' && method_exists($list, 'fetchAll')) {
+                    $stores = $pro->fetchAll(\PDO::FETCH_ASSOC);
+                } else {
+                    $stores = $pro->fetch_all(MYSQLI_ASSOC);
+                }
             } catch (\Exception $e) {
                 $stores = [false];
             }

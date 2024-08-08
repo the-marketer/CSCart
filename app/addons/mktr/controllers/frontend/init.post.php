@@ -79,7 +79,7 @@ for (let i of data) { window.mktr.buildEvent(i[0],i[1]); }
 };
 
 window.mktr.toCheck = function (data, d = null) {
-if (data != null && typeof data.search == "function" && window.mktr.loading) { 
+if (data != null && typeof data.search == "function" && window.mktr.loading) {
 ' . (MKTR_DEV ? ' console.log("mktr_data", data, d);' : '') . '
 if (data.search("cart") != -1 || data.search("cos") != -1 || data.search("wishlist") != -1 &&
     data.search("getAllWishlist") == -1 || d !== null && typeof d == "string" && d.search("cart") != -1) {

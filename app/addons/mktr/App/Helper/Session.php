@@ -20,6 +20,7 @@ class Session
 
     private $data = [];
     private $org = [];
+    public $insert = true;
 
     private $isDirty = false;
 
@@ -67,13 +68,18 @@ class Session
     {
         $uid = self::getUid();
         $data = Config::db()->getField('SELECT `data` FROM `' . self::$MKTR_TABLE . '` WHERE `uid` = "?p"', $uid);
+        $this->org = [];
         if (is_array($data)) {
-            $this->org = array_key_exists(0, $data) ? unserialize($data[0]['data']) : [];
+            if (array_key_exists(0, $data) && isset($data[0]['data'])) {
+                if ($data[0]['data'] != '') {
+                    $this->org = unserialize($data[0]['data']);
+                    $this->insert = false;
+                }
+            }
         } else {
             if ($data != '') {
+                $this->insert = false;
                 $this->org = unserialize($data);
-            } else {
-                $this->org = [];
             }
         }
         $this->data = $this->org;
@@ -110,12 +116,15 @@ class Session
                     'data' => serialize(self::i()->data),
                     'expire' => date('Y-m-d H:i:s', strtotime('+2 day')),
                 ];
-                if (count(self::i()->org) > 0) {
-                    Config::db()->query('UPDATE `' . self::$MKTR_TABLE . '` SET ?u WHERE `uid` = ?i', $data, $uid);
-                } else {
+                if (self::i()->insert) {
                     $data['uid'] = $uid;
                     Config::db()->query('INSERT INTO `' . self::$MKTR_TABLE . '` ?e', $data);
+                } else {
+                    Config::db()->query('UPDATE `' . self::$MKTR_TABLE . '` SET ?u WHERE `uid` = ?i', $data, $uid);
                 }
+            // if (count(self::i()->org) > 0) {
+            //    Config::db()->query('UPDATE `' . self::$MKTR_TABLE . '` SET ?u WHERE `uid` = ?i', $data, $uid);
+            // }
             } else {
                 Config::db()->query('DELETE FROM `' . self::$MKTR_TABLE . '` WHERE uid = ?i', $uid);
             }

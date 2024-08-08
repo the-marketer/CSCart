@@ -10,6 +10,7 @@
 
 namespace Mktr\Helper;
 
+
 class Admin
 {
     private static $i = null;
@@ -108,17 +109,7 @@ class Admin
     {
         if ($_SERVER['REQUEST_METHOD'] === 'GET' && $mode === 'update' && $_REQUEST['addon'] === 'mktr') {
             $this->rq();
-            $tabs = [
-                'settings' => [
-                    'title' => 'Settings',
-                    'js' => true,
-                ],
-                'detailed' => [
-                    'title' => 'General',
-                    'js' => true,
-                ],
-            ];
-/*
+
             if (self::$page === 'tracker') {
                 $tabs = [
                     'settings' => [
@@ -150,7 +141,6 @@ class Admin
                     ],
                 ];
             }
-*/
             if (self::$config->shop() !== 0) {
                 $tabs['reset'] = [
                     'title' => 'Reset to Main',
@@ -263,15 +253,32 @@ class Admin
     public static function product_features($type = null)
     {
         if (self::$product_features === null) {
-            $list = \Mktr\Model\Config::db()->query('SELECT `feature_id`,`description` FROM `?:product_features_descriptions` WHERE lang_code ="' . CART_LANGUAGE . '"')->fetch_all(MYSQLI_ASSOC);
-            self::$product_features = [['value' => 0, 'label' => 'Please Select']];
-            foreach ($list as $k => $v) {
-                self::$product_features[] = ['value' => $v['feature_id'], 'label' => $v['description'] . ' (feature)'];
-            }
-            $list = \Mktr\Model\Config::db()->query('SELECT `option_id`,`option_name`,`internal_option_name` FROM `?:product_options_descriptions` WHERE lang_code ="' . CART_LANGUAGE . '"')->fetch_all(MYSQLI_ASSOC);
-            foreach ($list as $k => $v) {
-                $label = (empty($v['internal_option_name']) ? $v['option_name'] : $v['internal_option_name']);
-                self::$product_features[] = ['value' => $v['option_id'], 'label' => $label . ' (option)'];
+            if (defined('PRODUCT_VERSION') && PRODUCT_VERSION === '4.3.1') {
+                self::$product_features = [['value' => 0, 'label' => 'Please Select']];
+            } else {
+                $list = \Mktr\Model\Config::db()->query('SELECT `feature_id`,`description` FROM `?:product_features_descriptions` WHERE lang_code ="' . CART_LANGUAGE . '"');
+                
+                if (PRODUCT_VERSION > '4.10.1' && method_exists($list, 'fetchAll')) {
+                    $list = $list->fetchAll(\PDO::FETCH_ASSOC);
+                } else {
+                    $list = $list->fetch_all(MYSQLI_ASSOC);
+                }
+                
+                self::$product_features = [['value' => 0, 'label' => 'Please Select']];
+                foreach ($list as $k => $v) {
+                    self::$product_features[] = ['value' => $v['feature_id'], 'label' => $v['description'] . ' (feature)'];
+                }
+                $list = \Mktr\Model\Config::db()->query('SELECT `option_id`,`option_name`,`internal_option_name` FROM `?:product_options_descriptions` WHERE lang_code ="' . CART_LANGUAGE . '"');
+
+                if (PRODUCT_VERSION > '4.10.1' && method_exists($list, 'fetchAll')) {
+                    $list = $list->fetchAll(\PDO::FETCH_ASSOC);
+                } else {
+                    $list = $list->fetch_all(MYSQLI_ASSOC);
+                }
+                foreach ($list as $k => $v) {
+                    $label = (empty($v['internal_option_name']) ? $v['option_name'] : $v['internal_option_name']);
+                    self::$product_features[] = ['value' => $v['option_id'], 'label' => $label . ' (option)'];
+                }
             }
         }
 

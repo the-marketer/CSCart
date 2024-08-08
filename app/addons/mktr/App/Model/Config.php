@@ -128,7 +128,13 @@ importScripts("https://t.themarketer.com/firebase.js");';
     public static function db()
     {
         if (self::$db === null) {
-            self::$db = \Tygh\Tygh::$app['db'];
+            if (defined('PRODUCT_VERSION') && PRODUCT_VERSION === '4.3.1') {
+                self::$db = new \Tygh\Database();
+            } else if (PRODUCT_VERSION > '4.10.1') {
+                self::$db = \Tygh\Tygh::$app['db'];
+            } else {
+                self::$db = \Tygh\Tygh::$app['db'];
+            }
         }
 
         return self::$db;
@@ -147,8 +153,12 @@ importScripts("https://t.themarketer.com/firebase.js");';
     public static function cShop()
     {
         if (self::$cShop === null) {
-            $params = self::shop() !== 0 ? ['storefront_id' => self::shop()] : [];
-            self::$cShop = \Tygh\Settings::instance($params);
+            if (defined('PRODUCT_VERSION') && PRODUCT_VERSION === '4.3.1') {
+                self::$cShop = \Tygh\Settings::instance();
+            } else {
+                $params = self::shop() !== 0 ? ['storefront_id' => self::shop()] : [];
+                self::$cShop = \Tygh\Settings::instance($params);
+            }
         }
 
         return self::$cShop;
@@ -459,14 +469,28 @@ importScripts("https://t.themarketer.com/firebase.js");';
     {
         if ($check !== null) {
             if (self::$product_features === null) {
-                $list = \Mktr\Model\Config::db()->query('SELECT `feature_id`,`description` FROM `?:product_features_descriptions` WHERE lang_code ="' . CART_LANGUAGE . '"')->fetch_all(MYSQLI_ASSOC);
+                $list = Config::db()->query('SELECT `feature_id`,`description` FROM `?:product_features_descriptions` WHERE lang_code ="' . CART_LANGUAGE . '"');
+                
+                if (PRODUCT_VERSION > '4.10.1' && method_exists($list, 'fetchAll')) {
+                    $list = $list->fetchAll(\PDO::FETCH_ASSOC);
+                } else {
+                    $list = $list->fetch_all(MYSQLI_ASSOC);
+                }
+                
                 self::$product_features = [];
 
                 foreach ($list as $k => $v) {
                     self::$product_features[$v['feature_id']] = $v['description'];
                 }
 
-                $list = \Mktr\Model\Config::db()->query('SELECT `option_id`,`option_name`,`internal_option_name` FROM `?:product_options_descriptions` WHERE lang_code ="' . CART_LANGUAGE . '"')->fetch_all(MYSQLI_ASSOC);
+                $list = Config::db()->query('SELECT `option_id`,`option_name`,`internal_option_name` FROM `?:product_options_descriptions` WHERE lang_code ="' . CART_LANGUAGE . '"');
+                
+                if (PRODUCT_VERSION > '4.10.1' && method_exists($list, 'fetchAll')) {
+                    $list = $list->fetchAll(\PDO::FETCH_ASSOC);
+                } else {
+                    $list = $list->fetch_all(MYSQLI_ASSOC);
+                }
+
                 foreach ($list as $k => $v) {
                     self::$product_features[$v['option_id']] = empty($v['internal_option_name']) ? $v['option_name'] : $v['internal_option_name'];
                 }

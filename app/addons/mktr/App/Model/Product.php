@@ -159,6 +159,8 @@ class Product extends DataBase
             // 'custom_extend' => [ 'product_id', 'product_name' ]
         ], $limit);
 
+        self::clear();
+
         if ($list[1]['page'] == $num) {
             self::$ll = $list[0];
 
@@ -204,12 +206,19 @@ class Product extends DataBase
                         'get_additional' => true,
                         'get_extra' => true,
                         'get_for_one_product' => true,
+                        // 'include_child_variations' => true,
+                        // 'group_child_variations'   => true
                     ]);
                 }
                 self::$d[$id]->data = $prod;
             } else {
                 self::$d[$id]->data = null;
             }
+            self::$d[$id]->var = null;
+            self::$d[$id]->varData = null;
+            self::$d[$id]->variant = [];
+            self::$d[$id]->optionList = [];
+            self::$d[$id]->variants = [[]];
         }
         self::$curent = self::$d[$id];
 
@@ -416,7 +425,7 @@ class Product extends DataBase
         if ($this->isCombination === null) {
             $is = true;
 
-            if (empty($this->product_features)) {
+            if (!empty($this->data['product_features'])) {
                 if ($is) {
                     $this->isCombination = [];
                 }
@@ -424,7 +433,7 @@ class Product extends DataBase
                 $is = false;
             }
 
-            if (empty($this->product_options)) {
+            if (!empty($this->data['product_options'])) {
                 if ($is) {
                     $this->isCombination = [];
                 }
@@ -462,7 +471,9 @@ class Product extends DataBase
                     if ($ComKey === 'product_options') {
                         $list = $this->product_options;
                     } else {
-                        $list = $this->product_features;
+                        // $list = $this->variation_features_variants;
+                        // $list = $this->product_features;
+                        $list = null;
                     }
                     if ($list != null) {
                         $newList = array_merge($newList, $list);
@@ -520,13 +531,20 @@ class Product extends DataBase
     protected function getPricesVarNow($witch = null)
     {
         if ($this->pricesVar === null) {
-            if (isset($this->data['original_price']) && $this->data['original_price'] > 0) {
+            if (isset($this->data['base_price']) && $this->data['base_price'] > 0) {
+                $sale_price = $this->data['base_price'];
+            } elseif (isset($this->data['original_price']) && $this->data['original_price'] > 0) {
                 $sale_price = $this->data['original_price'];
             } else {
                 $sale_price = $this->data['base_price'];
             }
             if (isset($this->data['list_price']) && $this->data['list_price'] > 0) {
                 $price = $this->data['list_price'];
+                $price -= $this->data['modifiers_price'];
+            // $this->data['list_discount'];
+            // $this->data['modifiers_price'];
+            } elseif (isset($this->data['price']) && $this->data['price'] > 0) {
+                $price = $this->data['price'];
             } else {
                 $price = $sale_price;
             }
@@ -539,7 +557,7 @@ class Product extends DataBase
             $p['price'] = $p['price'] <= 0 && $p['sale_price'] >= 0 ? $p['sale_price'] : $p['price'];
             $p['sale_price'] = $p['sale_price'] <= 0 ? $p['price'] : $p['sale_price'];
 
-            $p['price'] = max($p['sale_price'], $p['price']);
+            // $p['price'] = max($p['sale_price'], $p['price']);
             $this->pricesVar = $p;
         }
 
@@ -684,7 +702,7 @@ class Product extends DataBase
                 if (empty($newVariation['color'])) {
                     unset($newVariation['color']);
                 }
-
+                $newVariation['stock'] = $newVariation['stock'] < 0 ? 0 : $newVariation['stock'];
                 $variation[$byID ? $newVariation['id'] : $k] = $newVariation;
             }
             $this->data['byID'] = $byID;

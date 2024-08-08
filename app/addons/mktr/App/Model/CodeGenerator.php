@@ -83,9 +83,13 @@ class CodeGenerator
     protected function save()
     {
         $b = [];
-        $pro = Config::db()->
-            query('SELECT * FROM ?:promotion_descriptions WHERE `name` = "?p" ORDER BY promotion_id DESC LIMIT 1', $this->name)->
-            fetch_all(MYSQLI_ASSOC);
+        $pro = Config::db()->query('SELECT * FROM ?:promotion_descriptions WHERE `name` = "?p" ORDER BY promotion_id DESC LIMIT 1', $this->name);
+        
+        if (PRODUCT_VERSION > '4.10.1' && method_exists($list, 'fetchAll')) {
+            $pro = $pro->fetchAll(\PDO::FETCH_ASSOC);
+        } else {
+            $pro = $pro->fetch_all(MYSQLI_ASSOC);
+        }
 
         $this->promotion_id = '0';
         $this->data = [];
@@ -168,12 +172,16 @@ class CodeGenerator
 
     protected function checkCode()
     {
-        $pro = Config::db()->
-            query(
-                'SELECT * FROM ?:promotions WHERE `conditions_hash` LIKE "?p" ORDER BY promotion_id DESC LIMIT 1',
-                '%coupon_code=' . $this->code . '%'
-            )->fetch_all(MYSQLI_ASSOC);
-
+        $pro = Config::db()->query(
+            'SELECT * FROM ?:promotions WHERE `conditions_hash` LIKE "?p" ORDER BY promotion_id DESC LIMIT 1',
+            '%coupon_code=' . $this->code . '%'
+        );
+        
+        if (PRODUCT_VERSION > '4.10.1' && method_exists($list, 'fetchAll')) {
+            $pro =  $pro->fetchAll(\PDO::FETCH_ASSOC);
+        } else {
+            $pro =  $pro->fetch_all(MYSQLI_ASSOC);
+        }
         return !empty($pro);
     }
 

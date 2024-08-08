@@ -36,9 +36,12 @@ try {
     $_REQUEST['switch_company_id'] = 'all';
 
     require_once $root . '/init.php';
+    error_reporting(E_ALL);
+    @ini_set('display_errors', 1);
+    @ini_set('memory_limit', '4086G');
     @ini_set('max_execution_time', '3600');
     @set_time_limit(3600);
-    @ini_set('memory_limit', '1G');
+    @ini_set('zlib.output_compression', 0);
     fn_dispatch();
     // fn_dispatch('mktr', 'api', 'cron', '', AREA);
     // fn_dispatch('mktr', 'cron', 'index', '', AREA);
