@@ -85,7 +85,7 @@ class CodeGenerator
         $b = [];
         $pro = Config::db()->query('SELECT * FROM ?:promotion_descriptions WHERE `name` = "?p" ORDER BY promotion_id DESC LIMIT 1', $this->name);
         
-        if (PRODUCT_VERSION > '4.10.1' && method_exists($list, 'fetchAll')) {
+        if (PRODUCT_VERSION > '4.10.1' && method_exists($pro, 'fetchAll')) {
             $pro = $pro->fetchAll(\PDO::FETCH_ASSOC);
         } else {
             $pro = $pro->fetch_all(MYSQLI_ASSOC);
@@ -177,7 +177,7 @@ class CodeGenerator
             '%coupon_code=' . $this->code . '%'
         );
         
-        if (PRODUCT_VERSION > '4.10.1' && method_exists($list, 'fetchAll')) {
+        if (PRODUCT_VERSION > '4.10.1' && method_exists($pro, 'fetchAll')) {
             $pro =  $pro->fetchAll(\PDO::FETCH_ASSOC);
         } else {
             $pro =  $pro->fetch_all(MYSQLI_ASSOC);
