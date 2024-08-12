@@ -19,7 +19,7 @@ class Cron
             try {
                 $pro = \Mktr\Model\Config::db()->query('SELECT * FROM ?:storefronts');
 
-                if (PRODUCT_VERSION > '4.10.1' && method_exists($pro, 'fetchAll')) {
+                if (method_exists($pro, 'fetchAll')) {
                     $stores = $pro->fetchAll(\PDO::FETCH_ASSOC);
                 } else {
                     $stores = $pro->fetch_all(MYSQLI_ASSOC);
