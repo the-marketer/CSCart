@@ -213,14 +213,14 @@ function fn_get_mktr_tracker_form()
 {
     Mktr::i();
 
-    return Mktr\Helper\Admin::form('tracker');
+    return Mktr\Helper\Admin::form('mktr_tracker');
 }
 
 function fn_get_mktr_google_form()
 {
     Mktr::i();
 
-    return Mktr\Helper\Admin::form('google');
+    return Mktr\Helper\Admin::form('mktr_google');
 }
 
 function fn_mktr_change_order_status(&$nStatus = null, &$fStatus = null, &$order = null)

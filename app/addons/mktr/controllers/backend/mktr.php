@@ -14,7 +14,7 @@ if (!defined('BOOTSTRAP')) {
     exit('Access denied');
 }
 
-if (in_array($mode, ['tracker', 'google'])) {
+if (in_array($mode, ['mktr_tracker', 'mktr_google'])) {
     return [
         CONTROLLER_STATUS_OK,
         Url::buildUrn(['addons', 'update'], [
@@ -35,7 +35,7 @@ if ($mode === 'reset') {
         CONTROLLER_STATUS_OK,
         Url::buildUrn(['addons', 'update'], [
             'addon' => 'mktr',
-            'selected_sub_section' => 'tracker',
+            'selected_sub_section' => 'mktr_tracker',
             'selected_section' => 'settings',
             'storefront_id' => $_REQUEST['storefront_id'],
         ]),
@@ -58,5 +58,5 @@ if ($mode === 'cron') {
 
 return [
     CONTROLLER_STATUS_OK,
-    Url::buildUrn(['addons', 'update'], ['addon' => 'mktr', 'selected_sub_section' => 'tracker', 'selected_section' => 'settings']),
+    Url::buildUrn(['addons', 'update'], ['addon' => 'mktr', 'selected_sub_section' => 'mktr_tracker', 'selected_section' => 'settings']),
 ];
