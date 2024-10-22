@@ -160,7 +160,7 @@ class Admin
             } else {
                 $tabs['default'] = [
                     'title' => 'Reset to Default',
-                    'href' => 'mktr.default',
+                    'href' => 'mktr.default'
                 ];
             }
             \Tygh\Registry::set('navigation.tabs', $tabs);
@@ -397,7 +397,244 @@ class Admin
     </div>
     ';
         if ($add) {
-            $out .= '<script type="text/javascript"> setTimeout(function() { document.querySelector(".cm-js#mktr_' . $cPage . '").click(); }, 1000); </script>';
+
+            $out .= "<style>/* cyrillic-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/plusjakartasans/v8/LDIbaomQNQcsA88c7O9yZ4KMCoOg4IA6-91aHEjcWuA_qU79QB_VMq2oRsWk0Fs.woff2) format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+/* vietnamese */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/plusjakartasans/v8/LDIbaomQNQcsA88c7O9yZ4KMCoOg4IA6-91aHEjcWuA_qU79Qh_VMq2oRsWk0Fs.woff2) format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
+}
+/* latin-ext */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/plusjakartasans/v8/LDIbaomQNQcsA88c7O9yZ4KMCoOg4IA6-91aHEjcWuA_qU79Qx_VMq2oRsWk0Fs.woff2) format('woff2');
+  unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/plusjakartasans/v8/LDIbaomQNQcsA88c7O9yZ4KMCoOg4IA6-91aHEjcWuA_qU79TR_VMq2oRsWk.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* The Modal (background) */
+.mktr-modal {
+    display: none;
+    position: fixed;
+    z-index: 99999999999999;
+    padding-top: 100px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.mktr-modal-body {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 60%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    animation-duration: 0.4s;
+}
+
+.mktr-head {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px 36px;
+    width: 100%;
+    height: 64px;
+    background: #FCFBFE;
+    border-bottom: 1px solid #EAECF0;
+}
+
+.mktr-content {
+    width: 70%;
+    padding: 32px 0;
+    text-align: left;
+    font-family: Plus Jakarta Sans;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.mktr-content-footer {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 26px 0;
+}
+
+.mktr-button {
+    font-weight:bold;
+    padding: 10px 24px;
+    background-color: #2259FA;
+    color: #FFFFFF;
+    border-radius: 8px;
+    border-width: 0;
+}
+
+.red {
+    background-color: #fc0015;
+    color: #FFFFFF;
+}
+
+a.mktr-button {
+    color: #FFFFFF;
+}
+
+.mktr-button:hover {
+    text-decoration: none;
+    color: #FFFFFF;
+}
+
+.mktr-content
+{
+    width: 70% !important;
+    padding: 32px 0px 32px 0px !important;
+    justify-content: center;
+    align-items: center;
+    margin:auto;
+    font-family: Plus Jakarta Sans !important;
+    font-size: 14px !important;
+    font-weight: 400;
+    line-height: 1 !important;
+    letter-spacing: 0em;
+    text-align: left;
+}
+.mktr-content a
+{
+    text-decoration: none;
+    color: #1B47C8;
+}
+
+.mktr-modal-body .mktr-content {
+    padding: 0px 0px 0px 0px;
+}
+
+.mktr-content-head {
+    border-bottom: 1px solid #EAECF0;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-bottom: 10px;
+}
+
+.mktr-content-body {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 12px;
+    border: 1px dotted;
+    border-color: #EAECF0;
+    margin-top: 12px;
+}
+
+.mktr-content-text {
+    margin: 24px;
+}
+
+.mktr-content-footer {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 26px 0px !important;
+    display: flex;
+    flex: 2;
+    flex-wrap: wrap;
+}
+
+.mktr-content-footer>*:first-child {
+    flex-direction: flex-start !important;
+}
+.mktr-content-footer .mktr-content-right {
+    margin-left: auto;
+}
+.mktr-content-footer .mktr-button {
+    margin-top: -10px !important;
+}
+@media only screen and (max-width: 960px) {
+    .mktr-modal-body {
+        width: 80%;
+    }
+    .mktr-content {
+        width: 90%;
+    }
+}
+
+@media screen and (max-width: 782px) {
+    .mktr-modal-body {
+        width: 90%;
+    }
+}
+@media screen and (max-width: 500px) {
+    .mktr-content-footer .mktr-content-right {
+        width: 100%;
+    }
+    .mktr-content-footer .mktr-button { 
+        margin-top: 10px !important;
+    }
+}
+</style>
+<div class=\"mktr-modal\">
+    <div class=\"mktr-modal-body\">
+        <div class=\"mktr-head\"><img src=\"https://connector.themarketer.com/logo.png\"></div>
+        <div class=\"mktr-content\">
+            <div class=\"mktr-content-body\">
+                <div class=\"mktr-content-text\">
+                    <h4></h4>
+                </div>
+            </div>
+            <div class=\"mktr-content-footer\">
+                <div class=\"mktr-content-left\"><button type=\"button\" class=\"mktr-button no\">No!</button></div>
+                <div class=\"mktr-content-right\"><button type=\"button\" class=\"mktr-button red yes\">Yes!</button></div>
+            </div>
+        </div>
+    </div>
+</div>";
+$name = 'Store';
+
+if (self::$config->shop() !== 0) {
+    $name = \fn_get_storefront(self::$config->shop())->name;
+}
+            $out .= '<script type="text/javascript">
+document.addEventListener("click", function(event){
+    let show = { status: false, text: null };
+    if (event.target.matches("#default [href*=\'mktr.default\']")) {
+        show.status = true;
+        show.text = "Are you sure you want to reset all Main settings to their default values?<br />This action cannot be undone.";
+    } else if (event.target.matches("#reset [href*=\'mktr.reset\']")) {
+        show.status = true;
+        show.text = "Are you sure you want to reset \"'.$name.'\" settings to their Main settings values?<br />This action cannot be undone.";
+    } else if (event.target.matches(".mktr-modal .mktr-button.yes")) {
+        document.querySelector(".mktr-modal-body").style.display = "none";
+        window.open(document.querySelector("#default [href*=\'mktr.default\'],#reset [href*=\'mktr.reset\']").href, "_self");
+    } else if (event.target.matches(".mktr-modal .mktr-button.no")) { 
+        document.querySelector(".mktr-modal").style.display = "none";
+    }
+    if (show.status) {
+        event.preventDefault();
+        document.querySelector(".mktr-modal .mktr-content-text h4").innerHTML = show.text;
+        document.querySelector(".mktr-modal").style.display = "block";
+    }
+});
+setTimeout(function() { let q = document.querySelector(".cm-js#mktr_' . $cPage . ',.cm-js#' . $cPage . '"); if (typeof q != "undefined") { q.click(); } }, 1000);
+</script>';
         }
 
         return $out;

@@ -24,7 +24,7 @@ if (!defined('MKTR_CRON')) {
     define('MKTR_CRON', false);
 }
 if (!defined('MKTR_VERSION')) {
-    define('MKTR_VERSION', 'v1.0.3');
+    define('MKTR_VERSION', 'v1.0.3.5');
 }
 if (!function_exists('dd')) {
     function dd()
