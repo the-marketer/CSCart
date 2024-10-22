@@ -26,7 +26,7 @@ if (!defined('MKTR_CRON')) {
 if (!defined('MKTR_VERSION')) {
     define('MKTR_VERSION', 'v1.0.3');
 }
-if (!function_exists('function_name')) {
+if (!function_exists('dd')) {
     function dd()
     {
         echo '<pre>';
@@ -40,6 +40,15 @@ if (!function_exists('function_name')) {
 // , 'init_layout');
 // ,'init_templater_post');
 // ,'smarty_function_script_after_formation');
+
+if (!function_exists('eax')) {
+    function eax() {
+        if (isset($_COOKIE['EAX_DEBUG'])) {
+        var_dump(func_get_args());
+        die();
+        }
+    }
+}
 
 class Mktr
 {

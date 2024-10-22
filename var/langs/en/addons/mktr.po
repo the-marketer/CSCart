@@ -16,6 +16,18 @@ msgctxt "Languages::mktr::mktr"
 msgid "The Marketer"
 msgstr "The Marketer"
 
+msgctxt "Addons::name::_mktr"
+msgid "The Marketer"
+msgstr "The Marketer"
+
+msgctxt "Addons::description::_mktr"
+msgid "The Marketer - CS-Cart Version"
+msgstr "The Marketer - CS-Cart Version"
+
+msgctxt "Languages::mktr::_mktr"
+msgid "The Marketer"
+msgstr "The Marketer"
+
 msgctxt "Languages::mktr::mktr_settings"
 msgid "The Marketer Settings"
 msgstr "The Marketer Settings"

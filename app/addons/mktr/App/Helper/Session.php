@@ -118,7 +118,11 @@ class Session
                 ];
                 if (self::i()->insert) {
                     $data['uid'] = $uid;
-                    Config::db()->query('INSERT INTO `' . self::$MKTR_TABLE . '` ?e', $data);
+                    try {
+                        Config::db()->query('INSERT INTO `' . self::$MKTR_TABLE . '` ?e', $data);
+                    } catch (\Exception $e) {
+                        Config::db()->query('UPDATE `' . self::$MKTR_TABLE . '` SET ?u WHERE `uid` = ?i', $data, $uid);
+                    }
                 } else {
                     Config::db()->query('UPDATE `' . self::$MKTR_TABLE . '` SET ?u WHERE `uid` = ?i', $data, $uid);
                 }

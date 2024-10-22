@@ -17,6 +17,7 @@ class Admin
     private static $page = 'mktr_tracker';
     private static $config = null;
     private static $product_features = null;
+    private static $req = true;
 
     private static $err = [
         'log' => [],
@@ -92,7 +93,6 @@ class Admin
 
         setcookie('unInstall', 'Yes' . time());
     }
-    private static $req = true;
 
     private function rq()
     {
