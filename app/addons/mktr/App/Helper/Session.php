@@ -66,23 +66,38 @@ class Session
 
     public function __construct()
     {
+        $this->org = [];
+        $uid = self::checkUID(true);
+        $this->data = $this->org;
+    }
+
+    public static function checkUID($setOrg = false) {
+        $dataQuery = null;
         $uid = self::getUid();
         $data = Config::db()->getField('SELECT `data` FROM `' . self::$MKTR_TABLE . '` WHERE `uid` = "?p"', $uid);
-        $this->org = [];
+
         if (is_array($data)) {
             if (array_key_exists(0, $data) && isset($data[0]['data'])) {
                 if ($data[0]['data'] != '') {
-                    $this->org = unserialize($data[0]['data']);
-                    $this->insert = false;
+                    $dataQuery = $data[0]['data'];
                 }
             }
         } else {
             if ($data != '') {
-                $this->insert = false;
-                $this->org = unserialize($data);
+                $dataQuery = $data;
             }
         }
-        $this->data = $this->org;
+
+        if ($dataQuery != null) {
+            self::i()->insert = false;
+            $oldData = unserialize($dataQuery);
+            if ($setOrg) {
+                self::i()->org = $oldData;
+            } else {
+                foreach (self::i()->data as $k => $v) { $oldData[$k] = $v; }
+                self::i()->data = $oldData;
+            }
+        }
     }
 
     public static function set($key, $value = null)
@@ -112,30 +127,24 @@ class Session
             $table_name = self::$MKTR_TABLE;
 
             if (!empty(self::i()->data)) {
+                self::checkUID();
                 $data = [
                     'data' => serialize(self::i()->data),
                     'expire' => date('Y-m-d H:i:s', strtotime('+2 day')),
                 ];
+                
                 if (self::i()->insert) {
                     $data['uid'] = $uid;
-                    try {
-                        Config::db()->query('INSERT INTO `' . self::$MKTR_TABLE . '` ?e', $data);
-                    } catch (\Exception $e) {
-                        Config::db()->query('UPDATE `' . self::$MKTR_TABLE . '` SET ?u WHERE `uid` = ?i', $data, $uid);
-                    }
+                    Config::db()->query('DELETE FROM `' . self::$MKTR_TABLE . '` WHERE uid = ?i', $uid);
+                    Config::db()->query('INSERT INTO `' . self::$MKTR_TABLE . '` ?e', $data);
                 } else {
                     Config::db()->query('UPDATE `' . self::$MKTR_TABLE . '` SET ?u WHERE `uid` = ?i', $data, $uid);
                 }
-            // if (count(self::i()->org) > 0) {
-            //    Config::db()->query('UPDATE `' . self::$MKTR_TABLE . '` SET ?u WHERE `uid` = ?i', $data, $uid);
-            // }
-            } else {
-                Config::db()->query('DELETE FROM `' . self::$MKTR_TABLE . '` WHERE uid = ?i', $uid);
             }
 
             self::clearIfExipire();
             self::i()->isDirty = false;
-
+            
             return true;
         }
 
