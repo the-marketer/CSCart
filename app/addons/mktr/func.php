@@ -24,7 +24,7 @@ if (!defined('MKTR_CRON')) {
     define('MKTR_CRON', false);
 }
 if (!defined('MKTR_VERSION')) {
-    define('MKTR_VERSION', 'v1.0.3.5');
+    define('MKTR_VERSION', 'v1.0.3.7');
 }
 if (!function_exists('dd')) {
     function dd()
@@ -57,6 +57,7 @@ class Mktr
     public static $auth = null;
     public static $isApi = false;
     public static $ApiPath = null;
+    public static $loadJSData = true;
 
     public function __construct()
     {

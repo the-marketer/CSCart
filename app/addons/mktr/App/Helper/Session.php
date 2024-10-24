@@ -17,6 +17,7 @@ class Session
     private static $i = null;
     private static $uid = null;
     private static $MKTR_TABLE = null;
+    private static $count = 0;
 
     private $data = [];
     private $org = [];
@@ -66,15 +67,20 @@ class Session
 
     public function __construct()
     {
-        $this->org = [];
-        $uid = self::checkUID(true);
+        self::checkUID($this);
         $this->data = $this->org;
     }
 
-    public static function checkUID($setOrg = false) {
+    public static function checkUID($construct = null) {
         $dataQuery = null;
         $uid = self::getUid();
         $data = Config::db()->getField('SELECT `data` FROM `' . self::$MKTR_TABLE . '` WHERE `uid` = "?p"', $uid);
+        if ($construct !== null) {
+            $init = $construct;
+            $init->org = [];
+        } else {
+            $init = self::i();
+        }
 
         if (is_array($data)) {
             if (array_key_exists(0, $data) && isset($data[0]['data'])) {
@@ -89,13 +95,13 @@ class Session
         }
 
         if ($dataQuery != null) {
-            self::i()->insert = false;
+            $init->insert = false;
             $oldData = unserialize($dataQuery);
-            if ($setOrg) {
-                self::i()->org = $oldData;
+            if ($construct !== null) {
+                $init->org = $oldData;
             } else {
-                foreach (self::i()->data as $k => $v) { $oldData[$k] = $v; }
-                self::i()->data = $oldData;
+                foreach ($init->data as $k => $v) { $oldData[$k] = $v; }
+                $init->data = $oldData;
             }
         }
     }

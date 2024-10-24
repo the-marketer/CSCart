@@ -10,6 +10,7 @@
 defined('BOOTSTRAP') or exit('Access denied');
 
 Mktr::i();
+if (Mktr::$loadJSData) {
 $events = [];
 
 if (\Mktr\Model\Config::showJs(true)) {
@@ -197,3 +198,6 @@ $.ceEvent("on", "ce.ajaxdone", function (elms, scripts, params, responseData, re
 
 \Tygh\Registry::get('view')->assign('mktr', $c);
 \Tygh\Registry::get('view')->assign('mktr_events', PHP_EOL . implode(PHP_EOL, $events));
+\Tygh\Registry::get('view')->assign('mktr_status', Mktr::$loadJSData);
+    Mktr::$loadJSData = false;
+}
