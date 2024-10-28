@@ -39,7 +39,7 @@ function getOnePage($page, $store, $list)
     $start = $end - $store['limit'];
     while ($start <= $end) {
         // echo $page.'-'.$start.PHP_EOL;
-        $url = $store['link'] . 'mktr/api/feed' . ($store['q'] ? '&' : '?') . 'key=' . $store['rest_key'] . '&page=' . $start . '&limit=1&mime-type=json&no_save=1&t=' . time();
+        $url = $store['link'] . '?dispatch=mktr.api.feed&key=' . $store['rest_key'] . '&page=' . $start . '&limit=1&mime-type=json&no_save=1&t=' . time();
         $content = @file_get_contents($url);
 
         if ($content !== false) {
@@ -74,7 +74,7 @@ function run($store)
         while ($run) {
             // echo $page.PHP_EOL;
             // $store['limit'] = 2;
-            $url = $store['link'] . 'mktr/api/feed' . ($store['q'] ? '&' : '?') . 'key=' . $store['rest_key'] . '&page=' . $page . '&limit=' . $store['limit'] . '&mime-type=json&no_save=1&t=' . time();
+            $url = $store['link'] . '?dispatch=mktr.api.feed&key=' . $store['rest_key'] . '&page=' . $page . '&limit=' . $store['limit'] . '&mime-type=json&no_save=1&t=' . time();
             $content = @file_get_contents($url);
 
             if (empty($content)) {
@@ -112,7 +112,7 @@ function run($store)
     }
 
     if ($store['cron_review'] == 1 && $store['update_review_time'] < time()) {
-        file_get_contents($store['link'] . 'mktr/api/Reviews' . ($store['q'] ? '&' : '?') . 'key=' . $store['rest_key'] . '&start_date=' . strtotime('-' . ($store['update_review'] + 1) . ' hour'));
+        file_get_contents($store['link'] . '?dispatch=mktr.api.Reviews&key=' . $store['rest_key'] . '&start_date=' . strtotime('-' . ($store['update_review'] + 1) . ' hour'));
         $store['update_review_time'] = strtotime('+' . $store['update_review'] . ' hour');
         $status = true;
     }

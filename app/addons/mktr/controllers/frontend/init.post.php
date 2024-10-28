@@ -74,7 +74,7 @@ for (let data of window.mktr.pending) { if (data.event != "undefined") { dataLay
 };
 
 window.mktr.loadEvents = function () { let time = (new Date()).getTime(); window.mktr.loading = true;
-jQuery.get(window.mktr.base + "' . ($rewrite ? 'mktr/api/GetEvents?smuid=' . \Mktr\Helper\Session::getUid() . '&' : '?dispatch=mktr.api.GetEvents&') . 'mktr_time="+time, {}, function( data ) {
+jQuery.get(window.mktr.base + "?dispatch=mktr.api.GetEvents&mktr_time="+time, {}, function( data ) {
 for (let i of data) { window.mktr.buildEvent(i[0],i[1]); }
 });
 };
@@ -91,7 +91,7 @@ if (data.search("cart") != -1 || data.search("cos") != -1 || data.search("wishli
     setTimeout(function () {
         let time = (new Date()).getTime();
         let add = document.createElement("script"); add.async = true;
-        add.src = window.mktr.base + "' . ($rewrite ? 'mktr/api/setEmail?smuid=' . \Mktr\Helper\Session::getUid() . '&' : '?dispatch=mktr.api.setEmail&') . 'mktr_time="+time;
+        add.src = window.mktr.base + "?dispatch=mktr.api.setEmail&smuid=' . Mktr\Helper\Session::getUid() . '&mktr_time="+time;
         let s = document.getElementsByTagName("script")[0];
         s.parentNode.insertBefore(add,s);
     }, 1000);
@@ -188,8 +188,8 @@ $.ceEvent("on", "ce.ajaxdone", function (elms, scripts, params, responseData, re
     foreach ($evList as $key => $value) {
         if (!empty(Mktr\Helper\Session::get($key)) && $add[$value] === false) {
             $add[$value] = true;
-            $events[] = '<script type="text/javascript"> (function(){ let add = document.createElement("script"); add.async = true; add.src = window.mktr.base + "' . ($rewrite ? 'mktr/api/' . $value . '?smuid=' . \Mktr\Helper\Session::getUid() . '&' : '?dispatch=mktr.api.' . $value . '&') . 'mktr_time="+(new Date()).getTime(); let s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(add,s); })(); </script>';
-            $events[] = '<noscript><iframe src="' . \fn_url('') . ($rewrite ? 'mktr/api/' . $value . '?smuid=' . \Mktr\Helper\Session::getUid() . '&' : '?dispatch=mktr.api.' . $value . '&') . 'mktr_time=' . time() . '" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>';
+            $events[] = '<script type="text/javascript"> (function(){ let add = document.createElement("script"); add.async = true; add.src = window.mktr.base + "?dispatch=mktr.api.' . $value . '&smuid=' . \Mktr\Helper\Session::getUid() . '&mktr_time="+(new Date()).getTime(); let s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(add,s); })(); </script>';
+            $events[] = '<noscript><iframe src="' . \fn_url('') . '?dispatch=mktr.api.' . $value . '&smuid=' . \Mktr\Helper\Session::getUid() . '&mktr_time=' . time() . '" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>';
         }
     }
 } else {
