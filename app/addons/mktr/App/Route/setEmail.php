@@ -34,7 +34,6 @@ class setEmail
     {
         $evList = [
             'set_email' => '__sm__set_email',
-            'set_phone' => '__sm__set_phone',
         ];
         $events = [];
         $allGood = true;
@@ -44,6 +43,15 @@ class setEmail
             if (!empty($list) && is_array($list)) {
                 foreach ($list as $ey => $value1) {
                     $v = null;
+                    $phone = null;
+
+                    if (is_array($value1)) {
+                        $value1 = $value1[0];
+                        if (isset($value1[1])) {
+                            $phone = $value1[1];
+                        }
+                    }
+
                     if ($event === 'set_email') {
                         $v = Subscription::getByEmail($value1);
                         $value1 = ['email_address' => $value1];
@@ -57,8 +65,9 @@ class setEmail
                                 $value1['lastname'] = $v->lastname;
                             }
                         }
-                    } elseif ($event === 'set_phone') {
-                        $value1 = ['phone' => Valid::validateTelephone($value1)];
+                        if ($phone !== null) {
+                            $value1['phone'] = $phone;
+                        }
                     }
 
                     $events[] = "window.mktr.buildEvent('" . $event . "', " . Valid::toJson($value1) . ');';
@@ -79,6 +88,8 @@ class setEmail
 
                             if ($v->phone !== null) {
                                 $info['phone'] = $v->phone;
+                            } elseif ($phone !== null) {
+                                $info['phone'] = $phone;
                             }
 
                             Api::send('add_subscriber', $info);

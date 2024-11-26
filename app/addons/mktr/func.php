@@ -24,7 +24,7 @@ if (!defined('MKTR_CRON')) {
     define('MKTR_CRON', false);
 }
 if (!defined('MKTR_VERSION')) {
-    define('MKTR_VERSION', 'v1.0.3.8');
+    define('MKTR_VERSION', 'v1.0.4');
 }
 if (!function_exists('dd')) {
     function dd()
@@ -319,15 +319,18 @@ function fn_mktr_login_user_post($user_id, $cu_id, $udata, $auth, $condition, $r
 {
     if (array_key_exists('dispatch', $_REQUEST) && $_REQUEST['dispatch'] == 'auth.login') {
         Mktr::i();
-        if (array_key_exists('email', $auth) && !empty($auth['email'])) {
-            \Mktr\Helper\Session::setEmail($auth['email']);
-        } elseif (array_key_exists('email', $udata) && !empty($udata['email'])) {
-            \Mktr\Helper\Session::setEmail($udata['email']);
-        }
+        $phone = null;
+
         if (array_key_exists('phone', $auth) && !empty($auth['phone'])) {
-            \Mktr\Helper\Session::setPhone($auth['phone']);
+            $phone = $auth['phone'];
         } elseif (array_key_exists('phone', $udata) && !empty($udata['phone'])) {
-            \Mktr\Helper\Session::setPhone($udata['phone']);
+            $phone = $udata['phone'];
+        }
+        
+        if (array_key_exists('email', $auth) && !empty($auth['email'])) {
+            \Mktr\Helper\Session::setEmail($auth['email'], $phone);
+        } elseif (array_key_exists('email', $udata) && !empty($udata['email'])) {
+            \Mktr\Helper\Session::setEmail($udata['email'], $phone);
         }
 
         \Mktr\Helper\Session::save();

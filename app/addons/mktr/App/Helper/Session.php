@@ -198,14 +198,13 @@ class Session
         self::sessionSet('remove_from_cart', [$pId, $pAttr, $qty]);
     }
 
-    public static function setEmail($email)
+    public static function setEmail($email, $phone = null)
     {
-        self::sessionSet('set_email', $email);
-    }
-
-    public static function setPhone($phone)
-    {
-        self::sessionSet('set_phone', $phone);
+        if ($phone === null) {
+            self::sessionSet('set_email', $email, $email);
+        } else {
+            self::sessionSet('set_email', [$email, $phone], $email);
+        }
     }
 
     public static function sessionSet($name, $data, $key = null)

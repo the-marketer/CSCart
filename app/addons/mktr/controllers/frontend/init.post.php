@@ -55,8 +55,7 @@ window.mktr.eventsName = {
 "checkout":"__sm__initiate_checkout",
 "save_order":"__sm__order",
 "search":"__sm__search",
-"set_email":"__sm__set_email",
-"set_phone":"__sm__set_phone"
+"set_email":"__sm__set_email"
 };
 
 window.mktr.buildEvent = function (name = null, data = {}) {
@@ -112,7 +111,6 @@ $.ceEvent("on", "ce.ajaxdone", function (elms, scripts, params, responseData, re
 
     $evList = [
         'set_email' => 'setEmail',
-        'set_phone' => 'setEmail',
         'save_order' => 'saveOrder',
     ];
     $add = [
