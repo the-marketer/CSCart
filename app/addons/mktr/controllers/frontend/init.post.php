@@ -15,7 +15,7 @@ $events = [];
 
 if (\Mktr\Model\Config::showJs(true)) {
     $c = 'window.mktr = window.mktr || {};
-
+window.dataLayer = window.dataLayer || [];
 window.mktr.debug = function () { if (typeof dataLayer != "undefined") { for (let i of dataLayer) { console.log("Mktr", "Google", i); } } };
 window.mktr.ready = false;
 window.mktr.pending = [];
@@ -143,7 +143,8 @@ $.ceEvent("on", "ce.ajaxdone", function (elms, scripts, params, responseData, re
             $data = ['product_id' => Mktr\Helper\Valid::getParamReq('product_id')];
             break;
         case 'checkout.checkout':
-            // case 'cart':
+        case 'quickcheckout.checkout':
+        // case 'cart':
             $data = 0;
             $action = 'checkout';
             $data = null;
