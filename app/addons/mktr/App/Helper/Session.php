@@ -71,7 +71,8 @@ class Session
         $this->data = $this->org;
     }
 
-    public static function checkUID($construct = null) {
+    public static function checkUID($construct = null)
+    {
         $dataQuery = null;
         $uid = self::getUid();
         $data = Config::db()->getField('SELECT `data` FROM `' . self::$MKTR_TABLE . '` WHERE `uid` = "?p"', $uid);
@@ -100,7 +101,9 @@ class Session
             if ($construct !== null) {
                 $init->org = $oldData;
             } else {
-                foreach ($init->data as $k => $v) { $oldData[$k] = $v; }
+                foreach ($init->data as $k => $v) {
+                    $oldData[$k] = $v;
+                }
                 $init->data = $oldData;
             }
         }
@@ -138,7 +141,7 @@ class Session
                     'data' => serialize(self::i()->data),
                     'expire' => date('Y-m-d H:i:s', strtotime('+2 day')),
                 ];
-                
+
                 if (self::i()->insert) {
                     $data['uid'] = $uid;
                     Config::db()->query('DELETE FROM `' . self::$MKTR_TABLE . '` WHERE uid = ?i', $uid);
@@ -150,7 +153,7 @@ class Session
 
             self::clearIfExipire();
             self::i()->isDirty = false;
-            
+
             return true;
         }
 

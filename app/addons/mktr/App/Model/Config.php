@@ -130,7 +130,7 @@ importScripts("https://t.themarketer.com/firebase.js");';
         if (self::$db === null) {
             if (defined('PRODUCT_VERSION') && PRODUCT_VERSION === '4.3.1') {
                 self::$db = new \Tygh\Database();
-            } else if (PRODUCT_VERSION > '4.10.1') {
+            } elseif (PRODUCT_VERSION > '4.10.1') {
                 self::$db = \Tygh\Tygh::$app['db'];
             } else {
                 self::$db = \Tygh\Tygh::$app['db'];
@@ -470,13 +470,13 @@ importScripts("https://t.themarketer.com/firebase.js");';
         if ($check !== null) {
             if (self::$product_features === null) {
                 $list = Config::db()->query('SELECT `feature_id`,`description` FROM `?:product_features_descriptions` WHERE lang_code ="' . CART_LANGUAGE . '"');
-                
+
                 if (method_exists($list, 'fetchAll')) {
                     $list = $list->fetchAll(\PDO::FETCH_ASSOC);
                 } else {
                     $list = $list->fetch_all(MYSQLI_ASSOC);
                 }
-                
+
                 self::$product_features = [];
 
                 foreach ($list as $k => $v) {
@@ -484,7 +484,7 @@ importScripts("https://t.themarketer.com/firebase.js");';
                 }
 
                 $list = Config::db()->query('SELECT `option_id`,`option_name`,`internal_option_name` FROM `?:product_options_descriptions` WHERE lang_code ="' . CART_LANGUAGE . '"');
-                
+
                 if (method_exists($list, 'fetchAll')) {
                     $list = $list->fetchAll(\PDO::FETCH_ASSOC);
                 } else {

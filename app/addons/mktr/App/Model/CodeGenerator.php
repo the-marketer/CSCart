@@ -84,7 +84,7 @@ class CodeGenerator
     {
         $b = [];
         $pro = Config::db()->query('SELECT * FROM ?:promotion_descriptions WHERE `name` = "?p" ORDER BY promotion_id DESC LIMIT 1', $this->name);
-        
+
         if (method_exists($pro, 'fetchAll')) {
             $pro = $pro->fetchAll(\PDO::FETCH_ASSOC);
         } else {
@@ -176,12 +176,13 @@ class CodeGenerator
             'SELECT * FROM ?:promotions WHERE `conditions_hash` LIKE "?p" ORDER BY promotion_id DESC LIMIT 1',
             '%coupon_code=' . $this->code . '%'
         );
-        
+
         if (method_exists($pro, 'fetchAll')) {
-            $pro =  $pro->fetchAll(\PDO::FETCH_ASSOC);
+            $pro = $pro->fetchAll(\PDO::FETCH_ASSOC);
         } else {
-            $pro =  $pro->fetch_all(MYSQLI_ASSOC);
+            $pro = $pro->fetch_all(MYSQLI_ASSOC);
         }
+
         return !empty($pro);
     }
 

@@ -10,7 +10,6 @@
 
 namespace Mktr\Helper;
 
-
 class Admin
 {
     private static $i = null;
@@ -97,7 +96,6 @@ class Admin
     private function rq()
     {
         if (self::$req) {
-            
             self::$req = false;
             $_REQUEST['selected_sub_section'] = isset($_REQUEST['selected_sub_section']) && $_REQUEST['selected_sub_section'] === 'mktr_google' ? 'mktr_google' : 'mktr_tracker';
             $_REQUEST['selected_section'] = (empty($_REQUEST['selected_section']) || $_REQUEST['selected_section'] !== 'settings' ? 'settings' : $_REQUEST['selected_section']);
@@ -160,7 +158,7 @@ class Admin
             } else {
                 $tabs['default'] = [
                     'title' => 'Reset to Default',
-                    'href' => 'mktr.default'
+                    'href' => 'mktr.default',
                 ];
             }
             \Tygh\Registry::set('navigation.tabs', $tabs);
@@ -217,7 +215,7 @@ class Admin
                     self::$config->status = false;
                     $proccess[] = 'status';
                 }
-                
+
                 foreach ($proccess as $key) {
                     switch ($key) {
                         case 'opt_in':
@@ -291,13 +289,13 @@ class Admin
                 self::$product_features = [['value' => 0, 'label' => 'Please Select']];
             } else {
                 $list = \Mktr\Model\Config::db()->query('SELECT `feature_id`,`description` FROM `?:product_features_descriptions` WHERE lang_code ="' . CART_LANGUAGE . '"');
-                
+
                 if (method_exists($list, 'fetchAll')) {
                     $list = $list->fetchAll(\PDO::FETCH_ASSOC);
                 } else {
                     $list = $list->fetch_all(MYSQLI_ASSOC);
                 }
-                
+
                 self::$product_features = [['value' => 0, 'label' => 'Please Select']];
                 foreach ($list as $k => $v) {
                     self::$product_features[] = ['value' => $v['feature_id'], 'label' => $v['description'] . ' (feature)'];
@@ -397,7 +395,6 @@ class Admin
     </div>
     ';
         if ($add) {
-
             $out .= "<style>/* cyrillic-ext */
 @font-face {
   font-family: 'Plus Jakarta Sans';
@@ -607,11 +604,11 @@ a.mktr-button {
         </div>
     </div>
 </div>";
-$name = 'Store';
+            $name = 'Store';
 
-if (self::$config->shop() !== 0) {
-    $name = \fn_get_storefront(self::$config->shop())->name;
-}
+            if (self::$config->shop() !== 0) {
+                $name = \fn_get_storefront(self::$config->shop())->name;
+            }
             $out .= '<script type="text/javascript">
 document.addEventListener("click", function(event){
     let show = { status: false, text: null };
@@ -620,7 +617,7 @@ document.addEventListener("click", function(event){
         show.text = "Are you sure you want to reset all Main settings to their default values?<br />This action cannot be undone.";
     } else if (event.target.matches("#reset [href*=\'mktr.reset\']")) {
         show.status = true;
-        show.text = "Are you sure you want to reset \"'.$name.'\" settings to their Main settings values?<br />This action cannot be undone.";
+        show.text = "Are you sure you want to reset \"' . $name . '\" settings to their Main settings values?<br />This action cannot be undone.";
     } else if (event.target.matches(".mktr-modal .mktr-button.yes")) {
         document.querySelector(".mktr-modal-body").style.display = "none";
         window.open(document.querySelector("#default [href*=\'mktr.default\'],#reset [href*=\'mktr.reset\']").href, "_self");
