@@ -474,7 +474,7 @@ class Product extends DataBase
                         $list = $this->product_options;
                     } elseif ($ComKey === 'product_features') {
                         if (empty($this->data['variation_features_variants'])) {
-                            $list = $this->product_features;
+                            // $list = $this->product_features;
                         } else {
                             $this->getVariationFeatures();
                         }
@@ -736,13 +736,15 @@ class Product extends DataBase
         }
 
         foreach ($nvData as $kkData => $vvData) {
-            if (empty($vvData['size'])) {
-                unset($vvData['size']);
+            if ($vvData['price'] > 0 && $vvData['sale_price'] > 0) {
+                if (empty($vvData['size'])) {
+                    unset($vvData['size']);
+                }
+                if (empty($vvData['color'])) {
+                    unset($vvData['color']);
+                }
+                $this->varFeatData[] = $vvData;
             }
-            if (empty($vvData['color'])) {
-                unset($vvData['color']);
-            }
-            $this->varFeatData[$kkData] = $vvData;
         }
     }
 

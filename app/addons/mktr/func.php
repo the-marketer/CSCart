@@ -59,6 +59,7 @@ class Mktr
     public static $ApiPath = null;
     public static $loadJSData = true;
     public static $VERSION = "1.0.4.3";
+    public static $doEvent = true;
 
     public function __construct()
     {
@@ -236,14 +237,17 @@ function fn_get_mktr_google_form()
 
 function fn_mktr_change_order_status(&$nStatus = null, &$fStatus = null, &$order = null)
 {
-    Mktr::i();
-    if ($nStatus !== null && Mktr\Model\Config::rest()) {
-        $send = [
-            'order_number' => $order['order_id'],
-            'order_status' => \Mktr\Model\Orders::orderState($nStatus),
-        ];
+    if (Mktr::$doEvent) {
+        Mktr::$doEvent = false;
+        Mktr::i();
+        if ($nStatus !== null && Mktr\Model\Config::rest()) {
+            $send = [
+                'order_number' => $order['order_id'],
+                'order_status' => \Mktr\Model\Orders::orderState($nStatus),
+            ];
 
-        \Mktr\Helper\Api::send('update_order_status', $send, false);
+            \Mktr\Helper\Api::send('update_order_status', $send, false);
+        }
     }
 }
 
@@ -261,38 +265,68 @@ function fn_mktr_add_features($NewCart)
 
 function fn_mktr_add_to_cart($cart, $product_id, $_id)
 {
-    Mktr::i();
-    $NewCart = $cart['products'][$_id];
-    $NewCart['product_features'] = fn_mktr_add_features($NewCart);
-    $data = \Mktr\Model\Product::getProductFromCartData($NewCart);
-    Mktr\Helper\Session::addToCart($data['pId'], $data['pAttr'], $cart['products'][$_id]['amount']);
-    Mktr\Helper\Session::save();
+    if (Mktr::$doEvent) {
+        Mktr::$doEvent = false;
+        Mktr::i();
+        $NewCart = $cart['products'][$_id];
+        $NewCart['product_features'] = fn_mktr_add_features($NewCart);
+        $data = \Mktr\Model\Product::getProductFromCartData($NewCart);
+
+        if (isset($cart['product_data'][$_id]['amount'])) {
+            $items = $cart['product_data'][$_id]['amount'];
+        } else if (isset($cart['products'][$_id]['amount'])) {
+            $items = $cart['products'][$_id]['amount'];
+        } else {
+            $items = 1;
+        }
+
+        Mktr\Helper\Session::addToCart($data['pId'], $data['pAttr'], $items);
+        Mktr\Helper\Session::save();
+    }
 }
 
 function fn_mktr_delete_cart_product($cart, $_id, $full_erase)
 {
-    Mktr::i();
-    $NewCart = $cart['products'][$_id];
-    $NewCart['product_features'] = fn_mktr_add_features($NewCart);
-    $data = \Mktr\Model\Product::getProductFromCartData($NewCart);
-    Mktr\Helper\Session::removeFromCart($data['pId'], $data['pAttr'], $cart['products'][$_id]['amount']);
-    Mktr\Helper\Session::save();
+    if (Mktr::$doEvent) {
+        Mktr::$doEvent = false;
+        Mktr::i();
+        $NewCart = $cart['products'][$_id];
+        $NewCart['product_features'] = fn_mktr_add_features($NewCart);
+        $data = \Mktr\Model\Product::getProductFromCartData($NewCart);
+        
+        if (isset($cart['product_data'][$_id]['amount'])) {
+            $items = $cart['product_data'][$_id]['amount'];
+        } else if (isset($cart['products'][$_id]['amount'])) {
+            $items = $cart['products'][$_id]['amount'];
+        } else {
+            $items = 1;
+        }
+
+        Mktr\Helper\Session::removeFromCart($data['pId'], $data['pAttr'], $items);
+        Mktr\Helper\Session::save();
+    }
 }
 function fn_mktr_pre_add_to_wishlist($product_data, $wishlist, $auth)
 {
-    Mktr::i();
-    $product_data = end($product_data);
-    $data = \Mktr\Model\Product::getProductFromCartData($product_data);
-    Mktr\Helper\Session::addToWishlist($data['pId'], $data['pAttr']);
-    Mktr\Helper\Session::save();
+    if (Mktr::$doEvent) {
+        Mktr::$doEvent = false;
+        Mktr::i();
+        $product_data = end($product_data);
+        $data = \Mktr\Model\Product::getProductFromCartData($product_data);
+        Mktr\Helper\Session::addToWishlist($data['pId'], $data['pAttr']);
+        Mktr\Helper\Session::save();
+    }
 }
 
 function fn_mktr_delete_wishlist_product($wishlist, $wishlist_id)
 {
-    Mktr::i();
-    $data = \Mktr\Model\Product::getProductFromCartData($wishlist['products'][$wishlist_id]);
-    Mktr\Helper\Session::removeFromWishlist($data['pId'], $data['pAttr']);
-    Mktr\Helper\Session::save();
+    if (Mktr::$doEvent) {
+        Mktr::$doEvent = false;
+        Mktr::i();
+        $data = \Mktr\Model\Product::getProductFromCartData($wishlist['products'][$wishlist_id]);
+        Mktr\Helper\Session::removeFromWishlist($data['pId'], $data['pAttr']);
+        Mktr\Helper\Session::save();
+    }
 }
 
 function fn_mktr_newsletters_update_subscriptions_post($subscriber_id, $user_list_ids, $subscriber, $params)

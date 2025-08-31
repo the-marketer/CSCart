@@ -34,7 +34,7 @@ class Feed
 
             foreach ($cPage as $val) {
                 $prod = Product::getByID($val['product_id'], true);
-                if ($prod->sale_price > 0) {
+                if ($prod->sale_price > 0 && $prod->main_image != null) {
                     $data[] = $prod->toArray();
                 }
             }
