@@ -194,7 +194,7 @@ class Orders extends DataBase
             return $this->data['s_firstname'];
         }
 
-        return '';
+        return 'N/A';
     }
 
     protected function getLastName()
@@ -207,7 +207,7 @@ class Orders extends DataBase
             return $this->data['s_lastname'];
         }
 
-        return '';
+        return 'N/A';
     }
 
     protected function getPhone()
@@ -220,8 +220,11 @@ class Orders extends DataBase
         } elseif (!empty($this->data['s_phone'])) {
             $phone = $this->data['s_phone'];
         }
+
         if ($phone != null) {
             $phone = \Mktr\Helper\Valid::validateTelephone($phone);
+        } else {
+            $phone = 'N/A';
         }
 
         return $phone;
@@ -235,7 +238,7 @@ class Orders extends DataBase
             return $this->data['s_city'];
         }
 
-        return '';
+        return 'N/A';
     }
 
     protected function getCounty()
@@ -250,7 +253,7 @@ class Orders extends DataBase
             return $this->data['s_country'];
         }
 
-        return '';
+        return 'N/A';
     }
 
     protected function getAddress()
@@ -324,49 +327,22 @@ class Orders extends DataBase
             $products[$i]['brand'] = $pp->brand;
             $products[$i]['quantity'] = $p['amount'];
 
-            // $price = $p['original_price'];
-            // $tmp['price'] = $price;
             $tmp['sale_price'] = $p['original_price'];
             if (!isset($p['promotions'])) {
                 $p['promotions'] = [];
             }
             $promoPrice = $this->getPricesAfterPromo($tmp['sale_price'], $p['promotions']);
-            /*
-                        $tmp['price'] = $tmp['price'] <= 0 && $tmp['sale_price'] >= 0 ? $tmp['sale_price'] : $tmp['price'];
-                        $tmp['sale_price'] = $tmp['sale_price'] <= 0 ? $tmp['price'] : $tmp['sale_price'];
-
-                        $tmp['price'] = max($tmp['sale_price'], $tmp['price']);
-            */
-            // $products[$i]['price'] = $this->toDigit($p['amount'] * $tmp['sale_price']);
-            // $products[$i]['sale_price'] = $this->toDigit($tmp['sale_price']);
-
-            // $products[$i]['price'] = $this->toDigit($p['amount'] * $promoPrice);
 
             $products[$i]['price'] = $this->toDigit($p['original_price']);
             $products[$i]['sale_price'] = $this->toDigit($promoPrice);
 
-            $newVariation = [
-                'id' => [$pp->id],
-                'sku' => [$pp->sku],
-            ];
+            $pID = $p['product_id'];
 
-            if (!empty($p['variation_features'])) {
-                foreach ($p['variation_features'] as $val0) {
-                    $newVariation['id'][] = $val0['feature_id'];
-                    $newVariation['id'][] = $val0['variant_id'];
-                    $newVariation['sku'][] = $val0['variant'];
-                }
-            }
+            $vVariant = Product::getProductVariantOrder($pID, $pp, $p);
 
-            if (!empty($p['product_options'])) {
-                foreach ($p['product_options'] as $val0) {
-                    $newVariation['id'][] = $val0['option_id'];
-                    $newVariation['id'][] = $val0['value'];
-                    $newVariation['sku'][] = $val0['variant_name'];
-                }
-            }
-            $products[$i]['variation_id'] = str_replace(' ', '_', implode('_', $newVariation['id']));
-            $products[$i]['variation_sku'] = str_replace(' ', '_', implode('_', $newVariation['sku']));
+            $products[$i]['product_id'] = $pID;
+            $products[$i]['variation_id'] = $vVariant['id'];
+            $products[$i]['variation_sku'] = $vVariant['sku'];
             ++$i;
         }
 
@@ -379,26 +355,17 @@ class Orders extends DataBase
         $products = [];
         foreach ($this->data['products'] as $p) {
             $pp = Product::getByID($p['product_id'], true);
+            $pID = $p['product_id'];
+
+            $vVariant = Product::getProductVariantOrder($pID, $pp, $p);
+
             $products[$i]['product_id'] = $pp->id;
             $products[$i]['quantity'] = $p['amount'];
 
-            // $products[$i]['price'] = $p['amount'] * $p['original_price'];
-
             $products[$i]['price'] = $p['original_price'];
 
-            $newVariation = ['sku' => [$pp->sku]];
-
-            if (!empty($p['variation_features'])) {
-                foreach ($p['variation_features'] as $val0) {
-                    $newVariation['sku'][] = $val0['variant'];
-                }
-            }
-            if (!empty($p['product_options'])) {
-                foreach ($p['product_options'] as $val0) {
-                    $newVariation['sku'][] = $val0['variant_name'];
-                }
-            }
-            $products[$i]['variation_sku'] = str_replace(' ', '_', implode('_', $newVariation['sku']));
+            $products[$i]['product_id'] = $pID;
+            $products[$i]['variation_sku'] = $vVariant['sku'];
             ++$i;
         }
 

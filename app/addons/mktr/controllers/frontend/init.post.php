@@ -9,12 +9,12 @@
  **/
 defined('BOOTSTRAP') or exit('Access denied');
 
-Mktr::i();
-if (Mktr::$loadJSData) {
-$events = [];
+\Mktr::i();
+if (\Mktr::$loadJSData) {
+    $events = [];
 
 if (\Mktr\Model\Config::showJs(true)) {
-    $c = 'window.mktr = window.mktr || {};
+        $c = 'window.mktr = window.mktr || {};
 window.dataLayer = window.dataLayer || [];
 window.mktr.debug = function () { if (typeof dataLayer != "undefined") { for (let i of dataLayer) { console.log("Mktr", "Google", i); } } };
 window.mktr.ready = false;
@@ -24,20 +24,26 @@ window.mktr.loading = true;
 
 ';
 
-    $conf = \Mktr\Model\Config::i();
-    if (\Mktr\Model\Config::showGoogle()) {
-        $c = $c . "(function(w,d,s,l,i){
+        if (defined('PRODUCT_VERSION')) {
+            $c = $c . 'window.mktr.CS_VERSION = "' . PRODUCT_VERSION . '";';
+        }
+
+        $c = $c . 'window.mktr.MKTR_VERSION = "' . Mktr::$VERSION . '";';
+
+        $conf = \Mktr\Model\Config::i();
+        if (\Mktr\Model\Config::showGoogle()) {
+            $c = $c . "(function(w,d,s,l,i){
 w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
 var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
 j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl; f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','" . $conf->google_tagCode . "');
 
 ";
-    }
-    $rewrite = \Mktr\Model\Config::getSeo();
-    // $rewrite = false;
+        }
+        $rewrite = \Mktr\Model\Config::getSeo();
+        // $rewrite = false;
 
-    $c = $c . '(function(d, s, i) {
+        $c = $c . '(function(d, s, i) {
 var f = d.getElementsByTagName(s)[0], j = d.createElement(s);j.async = true;
 j.src = "https://t.themarketer.com/t/j/" + i; f.parentNode.insertBefore(j, f);
 window.mktr.ready = true;
@@ -90,7 +96,7 @@ if (data.search("cart") != -1 || data.search("cos") != -1 || data.search("wishli
     setTimeout(function () {
         let time = (new Date()).getTime();
         let add = document.createElement("script"); add.async = true;
-        add.src = window.mktr.base + "?dispatch=mktr.api.setEmail&smuid=' . Mktr\Helper\Session::getUid() . '&mktr_time="+time;
+        add.src = window.mktr.base + "?dispatch=mktr.api.setEmail&smuid=' . \Mktr\Helper\Session::getUid() . '&mktr_time="+time;
         let s = document.getElementsByTagName("script")[0];
         s.parentNode.insertBefore(add,s);
     }, 1000);
@@ -109,94 +115,106 @@ $.ceEvent("on", "ce.ajaxdone", function (elms, scripts, params, responseData, re
 })(Tygh, Tygh.$);
 ';
 
-    $evList = [
-        'set_email' => 'setEmail',
-        'save_order' => 'saveOrder',
-    ];
-    $add = [
-        'setEmail' => false,
-        'saveOrder' => false,
-    ];
+        $evList = [
+            'set_email' => 'setEmail',
+            'save_order' => 'saveOrder',
+        ];
+        $add = [
+            'setEmail' => false,
+            'saveOrder' => false,
+        ];
 
-    $data = null;
-    $action = Mktr\Helper\Valid::getParamReq('dispatch');
-    switch ($action) {
-        case '':
-        case 'index.index':
-            $action = 'home_page';
-            break;
-        case 'categories.view':
-            $action = 'category';
-            $data = Mktr\Helper\Valid::toJson(['category' => Mktr\Model\Category::getByID(Mktr\Helper\Valid::getParamReq('category_id'))->hierarchy]);
-            break;
-        case 'product_features.view':
-            $action = 'brand';
-            $data = ['name' => Mktr\Model\Brand::getByID(Mktr\Helper\Valid::getParamReq('variant_id'))->name];
-            break;
-        case 'products.search':
-            $action = 'search';
-            $data = ['search_term' => Mktr\Helper\Valid::getParamReq('q')];
-            break;
-        case 'product.view':
-        case 'products.view':
-            $action = 'product';
-            $data = ['product_id' => Mktr\Helper\Valid::getParamReq('product_id')];
-            break;
-        case 'checkout.checkout':
-        case 'quickcheckout.checkout':
-        // case 'cart':
-            $data = 0;
-            $action = 'checkout';
-            $data = null;
-            break;
-        default:
-    }
+        $data = null;
+        $action = \Mktr\Helper\Valid::getParamReq('dispatch');
+        switch ($action) {
+            case '':
+            case 'index.index':
+                $action = 'home_page';
+                break;
+            case 'categories.view':
+                $action = 'category';
+                $data = \Mktr\Helper\Valid::toJson(['category' => \Mktr\Model\Category::getByID(\Mktr\Helper\Valid::getParamReq('category_id'))->hierarchy]);
+                break;
+            case 'product_features.view':
+                $action = 'brand';
+                $data = ['name' => \Mktr\Model\Brand::getByID(\Mktr\Helper\Valid::getParamReq('variant_id'))->name];
+                break;
+            case 'products.search':
+                $action = 'search';
+                $data = ['search_term' => \Mktr\Helper\Valid::getParamReq('q')];
+                break;
+            case 'product.view':
+            case 'products.view':
+                $action = 'product';
+                $pro = \Mktr\Model\Product::getByID(\Mktr\Helper\Valid::getParamReq('product_id'), true);
 
-    if ($data === null) {
-        $data = 'null';
-    } elseif (is_array($data)) {
-        $data = Mktr\Helper\Valid::toJson($data);
-    }
+                $ppId = $pro->parent_product_id;
+                $pID = empty($ppId) ? $pro->id : $ppId;
 
-    $id_order = Mktr\Helper\Valid::getParamReq('order_id');
-
-    $events[] = '<script type="text/javascript"> window.mktr = window.mktr || {}; ';
-    $events[] = 'window.mktr.base = "' . \fn_url('') . '"';
-    $events[] = 'window.mktr.base = window.mktr.base.substr(window.mktr.base.length - 1) === "/" ? window.mktr.base : window.mktr.base+"/";';
-    $events[] = 'window.mktr.run = function () {';
-    if ($action !== null) {
-        $events[] = 'window.mktr.buildEvent("' . $action . '", ' . ($data === null ? 'null' : $data) . ');';
-    }
-    if ($id_order !== null) {
-        Mktr\Helper\Session::set('save_order', [$id_order]);
-        $events[] = 'window.mktr.buildEvent("save_order", ' . Mktr\Model\Orders::getByID($id_order)->toEvent(true) . ');';
-    }
-    $sessionData = \Mktr\Helper\Session::data();
-    foreach ($sessionData as $event => $value) {
-        if (in_array($event, ['add_to_cart', 'remove_from_cart', 'add_to_wish_list', 'remove_from_wishlist']) && !empty($value)) {
-            $events[] = ' window.mktr.loadEvents();';
-            break;
+                $data = ['product_id' => $pID];
+                break;
+            case 'checkout.checkout':
+            case 'quickcheckout.checkout':
+                // case 'cart':
+                $data = 0;
+                $action = 'checkout';
+                $data = null;
+                break;
+            default:
         }
-    }
-    $events[] = '};';
-    if (!empty($conf->selectors)) {
-        $events[] = '$("' . $conf->selectors . '").on("click", window.mktr.loadEvents);';
-    }
-    $events[] = '(typeof window.mktr.buildEvent != "function") ? document.addEventListener("mktr_loaded", function () { window.mktr.run(); }) : window.mktr.run();';
-    $events[] = ' </script>';
-    foreach ($evList as $key => $value) {
-        if (!empty(Mktr\Helper\Session::get($key)) && $add[$value] === false) {
-            $add[$value] = true;
-            $events[] = '<script type="text/javascript"> (function(){ let add = document.createElement("script"); add.async = true; add.src = window.mktr.base + "?dispatch=mktr.api.' . $value . '&smuid=' . \Mktr\Helper\Session::getUid() . '&mktr_time="+(new Date()).getTime(); let s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(add,s); })(); </script>';
-            $events[] = '<noscript><iframe src="' . \fn_url('') . '?dispatch=mktr.api.' . $value . '&smuid=' . \Mktr\Helper\Session::getUid() . '&mktr_time=' . time() . '" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>';
-        }
-    }
-} else {
-    $c = '';
-}
 
-\Tygh\Registry::get('view')->assign('mktr', $c);
-\Tygh\Registry::get('view')->assign('mktr_events', PHP_EOL . implode(PHP_EOL, $events));
-\Tygh\Registry::get('view')->assign('mktr_status', Mktr::$loadJSData);
+        if ($data === null) {
+            $data = 'null';
+        } elseif (is_array($data)) {
+            $data = \Mktr\Helper\Valid::toJson($data);
+        }
+
+        $id_order = \Mktr\Helper\Valid::getParamReq('order_id');
+
+        $events[] = '<script type="text/javascript"> window.mktr = window.mktr || {};';
+        $events[] = 'window.dataLayer = window.dataLayer || [];';
+        if (defined('PRODUCT_VERSION')) {
+            $events[] = 'window.mktr.CS_VERSION = "' . PRODUCT_VERSION . '";';
+        }
+
+        $events[] = 'window.mktr.MKTR_VERSION = "' . Mktr::$VERSION . '";';
+
+        $events[] = 'window.mktr.base = "' . \fn_url('') . '"';
+        $events[] = 'window.mktr.base = window.mktr.base.substr(window.mktr.base.length - 1) === "/" ? window.mktr.base : window.mktr.base+"/";';
+        $events[] = 'window.mktr.run = function () {';
+        if ($action !== null) {
+            $events[] = 'window.mktr.buildEvent("' . $action . '", ' . ($data === null ? 'null' : $data) . ');';
+        }
+        if ($id_order !== null) {
+            \Mktr\Helper\Session::set('save_order', [$id_order]);
+            $events[] = 'window.mktr.buildEvent("save_order", ' . \Mktr\Model\Orders::getByID($id_order)->toEvent(true) . ');';
+        }
+        $sessionData = \Mktr\Helper\Session::data();
+        foreach ($sessionData as $event => $value) {
+            if (in_array($event, ['add_to_cart', 'remove_from_cart', 'add_to_wish_list', 'remove_from_wishlist']) && !empty($value)) {
+                $events[] = ' window.mktr.loadEvents();';
+                break;
+            }
+        }
+        $events[] = '};';
+        if (!empty($conf->selectors)) {
+            $events[] = '$("' . $conf->selectors . '").on("click", window.mktr.loadEvents);';
+        }
+        $events[] = '(typeof window.mktr.buildEvent != "function") ? document.addEventListener("mktr_loaded", function () { window.mktr.run(); }) : window.mktr.run();';
+        $events[] = ' </script>';
+        foreach ($evList as $key => $value) {
+            if (!empty(\Mktr\Helper\Session::get($key)) && $add[$value] === false) {
+                $add[$value] = true;
+                $events[] = '<script type="text/javascript"> (function(){ let add = document.createElement("script"); add.async = true; add.src = window.mktr.base + "?dispatch=mktr.api.' . $value . '&smuid=' . \Mktr\Helper\Session::getUid() . '&mktr_time="+(new Date()).getTime(); let s = document.getElementsByTagName("script")[0]; s.parentNode.insertBefore(add,s); })(); </script>';
+                $events[] = '<noscript><iframe src="' . \fn_url('') . '?dispatch=mktr.api.' . $value . '&smuid=' . \Mktr\Helper\Session::getUid() . '&mktr_time=' . time() . '" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>';
+            }
+        }
+    } else {
+        $c = '';
+    }
+
+    Tygh\Registry::get('view')->assign('mktr', $c);
+    Tygh\Registry::get('view')->assign('mktr_events', PHP_EOL . implode(PHP_EOL, $events));
+    Tygh\Registry::get('view')->assign('mktr_status', Mktr::$loadJSData);
     Mktr::$loadJSData = false;
 }

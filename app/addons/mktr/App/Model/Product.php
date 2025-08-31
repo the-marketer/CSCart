@@ -108,6 +108,7 @@ class Product extends DataBase
     protected $reference = null;
     protected $var = null;
     protected $varData = null;
+    protected $varFeatData = null;
     protected $variant = [];
     protected $optionList = [];
     protected $variants = [[]];
@@ -468,12 +469,15 @@ class Product extends DataBase
                 $opt = 'variants';
                 $newList = [];
                 foreach ($this->isCombination() as $ComKey) {
+                    $list = null;
                     if ($ComKey === 'product_options') {
                         $list = $this->product_options;
-                    } else {
-                        // $list = $this->variation_features_variants;
-                        // $list = $this->product_features;
-                        $list = null;
+                    } elseif ($ComKey === 'product_features') {
+                        if (empty($this->data['variation_features_variants'])) {
+                            $list = $this->product_features;
+                        } else {
+                            $this->getVariationFeatures();
+                        }
                     }
                     if ($list != null) {
                         $newList = array_merge($newList, $list);
@@ -584,14 +588,19 @@ class Product extends DataBase
     public static function getProductFromCartData($cart)
     {
         $pID = $cart['product_id'];
-        $pro = self::getByID($pID, true);
 
         if (!empty($cart['product_features']) || !empty($cart['product_options'])) {
             $vID = [$pID];
             foreach (['product_features', 'product_options'] as $val) {
                 if (array_key_exists($val, $cart) && is_array($cart[$val])) {
                     foreach ($cart[$val] as $k => $v) {
-                        $vID[] = $k . '_' . $v;
+                        if (is_array($v)) {
+                            if (isset($v['value'])) {
+                                $vID[] = $k . '_' . $v['value'];
+                            }
+                        } else {
+                            $vID[] = $k . '_' . $v;
+                        }
                     }
                 }
             }
@@ -603,7 +612,7 @@ class Product extends DataBase
         return ['pId' => $pID, 'pAttr' => null];
     }
 
-    public static function getProductVariant($pID, $vID)
+    public static function getProductVariant(&$pID, $vID)
     {
         $pro = self::getByID($pID, true);
         if ($vID !== null) {
@@ -630,8 +639,111 @@ class Product extends DataBase
                 }
             }
         }
+        $ppId = $pro->parent_product_id;
+        $pID = empty($ppId) ? $pro->id : $ppId;
 
         return ['id' => $pro->id, 'sku' => $pro->sku];
+    }
+
+    public static function getProductVariantOrder(&$pID, $pro, $p)
+    {
+        $ppId = $pro->parent_product_id;
+        if (empty($ppId)) {
+            $data = \Mktr\Model\Product::getProductFromCartData($p);
+            // $vID = null;
+            // $pID = $pro->id;
+            $pID = $data['pId'];
+            $vID = $data['pAttr'];
+        } else {
+            $pID = $ppId;
+            $vID = $pro->id;
+            $pro = self::getByID($pID, true);
+        }
+
+        if ($vID !== null) {
+            $vv = $pro->getVariantData();
+            if ($vv != null) {
+                if (array_key_exists($vID, $vv)) {
+                    return $vv[$vID];
+                } else {
+                    $vID2 = explode('_', $vID, 2);
+                    $toAdd = [];
+                    foreach ($pro->getDefault as $k => $v) {
+                        if (strpos($vID2[1], $k . '_' . $v) === false) {
+                            $toAdd[] = $k;
+                            $toAdd[] = $v;
+                            // $vID2[1] = $k.'_'.$v.'_'.$vID2[1];
+                        }
+                    }
+                    $vID2[1] = implode('_', $toAdd) . '_' . $vID2[1];
+                    $vID2 = implode('_', $vID2);
+
+                    if (array_key_exists($vID2, $vv)) {
+                        return $vv[$vID2];
+                    }
+                }
+            }
+        }
+
+        return ['id' => $pro->id, 'sku' => $pro->sku];
+    }
+
+    protected function getVariationFeatures()
+    {
+        $nvData = [];
+        foreach ($this->variation_features_variants as $feature) {
+            foreach ($feature['variants'] as $vars) {
+                if (isset($vars['product_id'])) {
+                    $sID = $vars['product_id'];
+                } else {
+                    $sID = $this->id;
+                }
+
+                $prod = Product::getByID($sID, true);
+
+                if (!isset($nvData[$prod->id])) {
+                    $nvData[$prod->id] = [
+                        'id' => $prod->id,
+                        'sku' => $prod->sku,
+                        'acquisition_price' => 0,
+                        'price' => $prod->price,
+                        'sale_price' => $prod->sale_price,
+                        'availability' => $prod->availability,
+                        'stock' => $vars['amount'],
+                        'size' => null,
+                        'color' => null,
+                    ];
+
+                    $ff = $prod->variation_features;
+
+                    if (!empty($ff)) {
+                        foreach ($ff as $fff) {
+                            if ($this->isColor($fff['feature_id'])) {
+                                $nvData[$prod->id]['color'] = $fff['variant'];
+                            } elseif ($this->isSize($fff['feature_id'])) {
+                                $nvData[$prod->id]['size'] = $fff['variant'];
+                            }
+                        }
+                    }
+                }
+
+                if ($this->isColor($feature['feature_id'])) {
+                    $nvData[$prod->id]['color'] = $vars['variant'];
+                } elseif ($this->isSize($feature['feature_id'])) {
+                    $nvData[$prod->id]['size'] = $vars['variant'];
+                }
+            }
+        }
+
+        foreach ($nvData as $kkData => $vvData) {
+            if (empty($vvData['size'])) {
+                unset($vvData['size']);
+            }
+            if (empty($vvData['color'])) {
+                unset($vvData['color']);
+            }
+            $this->varFeatData[$kkData] = $vvData;
+        }
     }
 
     protected function getVariation($byID = false)
@@ -640,73 +752,84 @@ class Product extends DataBase
             $variation = [];
 
             $this->buildProducts();
-            foreach ($this->variants as $k => $val) {
-                if (empty($val)) {
-                    continue;
-                }
-                /** @noinspection PhpArrayIndexImmediatelyRewrittenInspection */
-                $newVariation = [
-                    'id' => [$this->id],
-                    'sku' => [$this->sku],
-                    'acquisition_price' => 0,
-                    'price' => $this->getPricesVarNow('price'),
-                    'sale_price' => $this->getPricesVarNow('sale_price'),
-                    'availability' => $this->availability,
-                    'stock' => 0,
-                    'size' => null,
-                    'color' => null,
-                ];
-                foreach ($val as $val0) {
-                    $id = $val0['option_id'];
-                    $name = $val0['variant_name'];
-
-                    if ($this->isColor($val0['option_id'])) {
-                        $newVariation['color'] = $val0['variant_name'];
-                    } elseif ($this->isSize($val0['option_id'])) {
-                        $newVariation['size'] = $val0['variant_name'];
+            if (!empty($this->varFeatData)) {
+                $this->data['byID'] = $byID;
+                if ($byID) {
+                    foreach ($this->varFeatData as $kk => $vv) {
+                        $this->var[$kk] = $vv;
                     }
+                } else {
+                    $this->var = $this->varFeatData;
+                }
+            } else {
+                foreach ($this->variants as $k => $val) {
+                    if (empty($val)) {
+                        continue;
+                    }
+                    /** @noinspection PhpArrayIndexImmediatelyRewrittenInspection */
+                    $newVariation = [
+                        'id' => [$this->id],
+                        'sku' => [$this->sku],
+                        'acquisition_price' => 0,
+                        'price' => $this->getPricesVarNow('price'),
+                        'sale_price' => $this->getPricesVarNow('sale_price'),
+                        'availability' => $this->availability,
+                        'stock' => 0,
+                        'size' => null,
+                        'color' => null,
+                    ];
+                    foreach ($val as $val0) {
+                        $id = $val0['option_id'];
+                        $name = $val0['variant_name'];
 
-                    $newVariation['id'][] = $val0['option_id'];
-                    $newVariation['id'][] = $val0['variant_id'];
+                        if ($this->isColor($val0['option_id'])) {
+                            $newVariation['color'] = $val0['variant_name'];
+                        } elseif ($this->isSize($val0['option_id'])) {
+                            $newVariation['size'] = $val0['variant_name'];
+                        }
 
-                    $newVariation['sku'][] = $val0['variant_name'];
+                        $newVariation['id'][] = $val0['option_id'];
+                        $newVariation['id'][] = $val0['variant_id'];
 
-                    if ($val0['modifier'] != 0) {
-                        if ($val0['modifier_type'] == 'A') {
-                            $newVariation['price'] += $val0['modifier'];
-                            $newVariation['sale_price'] += $val0['modifier'];
+                        $newVariation['sku'][] = $val0['variant_name'];
+
+                        if ($val0['modifier'] != 0) {
+                            if ($val0['modifier_type'] == 'A') {
+                                $newVariation['price'] += $val0['modifier'];
+                                $newVariation['sale_price'] += $val0['modifier'];
+                            } else {
+                                $newVariation['price'] += ($newVariation['price'] * ($val0['modifier'] / 100));
+                                $newVariation['sale_price'] += ($newVariation['sale_price'] * ($val0['modifier'] / 100));
+                            }
+                        }
+
+                        if ($newVariation['stock'] === 0) {
+                            $newVariation['stock'] = $this->amount;
                         } else {
-                            $newVariation['price'] += ($newVariation['price'] * ($val0['modifier'] / 100));
-                            $newVariation['sale_price'] += ($newVariation['sale_price'] * ($val0['modifier'] / 100));
+                            $newVariation['stock'] = min($newVariation['stock'], $this->amount);
                         }
                     }
+                    $newVariation['sale_price'] = $this->getPricesAfterPromo($newVariation['sale_price']);
 
-                    if ($newVariation['stock'] === 0) {
-                        $newVariation['stock'] = $this->amount;
-                    } else {
-                        $newVariation['stock'] = min($newVariation['stock'], $this->amount);
+                    $newVariation['id'] = str_replace(' ', '_', implode('_', $newVariation['id']));
+                    $newVariation['sku'] = str_replace(' ', '_', implode('_', $newVariation['sku']));
+
+                    $newVariation['price'] = $this->toDigit($newVariation['price']);
+                    $newVariation['sale_price'] = $this->toDigit($newVariation['sale_price']);
+
+                    if (empty($newVariation['size'])) {
+                        unset($newVariation['size']);
                     }
+
+                    if (empty($newVariation['color'])) {
+                        unset($newVariation['color']);
+                    }
+                    $newVariation['stock'] = $newVariation['stock'] < 0 ? 0 : $newVariation['stock'];
+                    $variation[$byID ? $newVariation['id'] : $k] = $newVariation;
                 }
-                $newVariation['sale_price'] = $this->getPricesAfterPromo($newVariation['sale_price']);
-
-                $newVariation['id'] = str_replace(' ', '_', implode('_', $newVariation['id']));
-                $newVariation['sku'] = str_replace(' ', '_', implode('_', $newVariation['sku']));
-
-                $newVariation['price'] = $this->toDigit($newVariation['price']);
-                $newVariation['sale_price'] = $this->toDigit($newVariation['sale_price']);
-
-                if (empty($newVariation['size'])) {
-                    unset($newVariation['size']);
-                }
-
-                if (empty($newVariation['color'])) {
-                    unset($newVariation['color']);
-                }
-                $newVariation['stock'] = $newVariation['stock'] < 0 ? 0 : $newVariation['stock'];
-                $variation[$byID ? $newVariation['id'] : $k] = $newVariation;
+                $this->data['byID'] = $byID;
+                $this->var = $variation;
             }
-            $this->data['byID'] = $byID;
-            $this->var = $variation;
         }
 
         if (!empty($this->var)) {
@@ -722,24 +845,28 @@ class Product extends DataBase
             $variation = [];
             $this->getDefault = [];
             $this->buildProducts();
-            foreach ($this->variants as $k => $val) {
-                if (empty($val)) {
-                    continue;
+            if (!empty($this->varFeatData)) {
+                $this->varData = $this->varFeatData;
+            } else {
+                foreach ($this->variants as $k => $val) {
+                    if (empty($val)) {
+                        continue;
+                    }
+                    $newVariation = ['id' => [$this->id], 'sku' => [$this->sku]];
+
+                    foreach ($val as $val0) {
+                        $newVariation['id'][] = $val0['option_id'];
+                        $newVariation['id'][] = $val0['variant_id'];
+                        $newVariation['sku'][] = $val0['variant_name'];
+                    }
+
+                    $newVariation['id'] = str_replace(' ', '_', implode('_', $newVariation['id']));
+                    $newVariation['sku'] = str_replace(' ', '_', implode('_', $newVariation['sku']));
+
+                    $variation[$newVariation['id']] = $newVariation;
                 }
-                $newVariation = ['id' => [$this->id], 'sku' => [$this->sku]];
-
-                foreach ($val as $val0) {
-                    $newVariation['id'][] = $val0['option_id'];
-                    $newVariation['id'][] = $val0['variant_id'];
-                    $newVariation['sku'][] = $val0['variant_name'];
-                }
-
-                $newVariation['id'] = str_replace(' ', '_', implode('_', $newVariation['id']));
-                $newVariation['sku'] = str_replace(' ', '_', implode('_', $newVariation['sku']));
-
-                $variation[$newVariation['id']] = $newVariation;
+                $this->varData = $variation;
             }
-            $this->varData = $variation;
         }
 
         if (!empty($this->varData)) {

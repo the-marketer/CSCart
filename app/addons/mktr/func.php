@@ -58,6 +58,7 @@ class Mktr
     public static $isApi = false;
     public static $ApiPath = null;
     public static $loadJSData = true;
+    public static $VERSION = "1.0.4.3";
 
     public function __construct()
     {
