@@ -314,10 +314,11 @@ class Orders extends DataBase
         $products = [];
         foreach ($this->data['products'] as $p) {
             $pp = Product::getByID($p['product_id'], true);
-            if ($pp->id === null) {
+            $tmp = [];
+
+            if ($pp->id === null || $p['price'] <= 0) {
                 continue;
             }
-            $tmp = [];
             $products[$i]['product_id'] = $pp->id;
             $products[$i]['sku'] = $pp->sku;
             $products[$i]['name'] = $pp->name;
@@ -328,12 +329,19 @@ class Orders extends DataBase
             $products[$i]['quantity'] = $p['amount'];
 
             $tmp['sale_price'] = $p['original_price'];
+
             if (!isset($p['promotions'])) {
                 $p['promotions'] = [];
             }
+            
             $promoPrice = $this->getPricesAfterPromo($tmp['sale_price'], $p['promotions']);
 
-            $products[$i]['price'] = $this->toDigit($p['original_price']);
+            if ($pp->price > $p['original_price']) {
+                $products[$i]['price'] = $pp->price;
+            } else {
+                $products[$i]['price'] = $this->toDigit($p['original_price']);
+            }
+
             $products[$i]['sale_price'] = $this->toDigit($promoPrice);
 
             $pID = $p['product_id'];
@@ -354,7 +362,13 @@ class Orders extends DataBase
         $i = 0;
         $products = [];
         foreach ($this->data['products'] as $p) {
+            $tmp = [];
             $pp = Product::getByID($p['product_id'], true);
+
+            if ($pp->id === null || $p['price'] <= 0) {
+                continue;
+            }
+
             $pID = $p['product_id'];
 
             $vVariant = Product::getProductVariantOrder($pID, $pp, $p);
@@ -362,7 +376,15 @@ class Orders extends DataBase
             $products[$i]['product_id'] = $pp->id;
             $products[$i]['quantity'] = $p['amount'];
 
-            $products[$i]['price'] = $p['original_price'];
+            $tmp['sale_price'] = $p['original_price'];
+
+            if (!isset($p['promotions'])) {
+                $p['promotions'] = [];
+            }
+
+            $promoPrice = $this->getPricesAfterPromo($tmp['sale_price'], $p['promotions']);
+
+            $products[$i]['price'] = $this->toDigit($promoPrice);
 
             $products[$i]['product_id'] = $pID;
             $products[$i]['variation_sku'] = $vVariant['sku'];

@@ -265,47 +265,37 @@ function fn_mktr_add_features($NewCart)
 
 function fn_mktr_add_to_cart($cart, $product_id, $_id)
 {
-    if (Mktr::$doEvent) {
+    if (Mktr::$doEvent && $cart['products'][$_id]['price'] > 0) {
         Mktr::$doEvent = false;
         Mktr::i();
+
         $NewCart = $cart['products'][$_id];
         $NewCart['product_features'] = fn_mktr_add_features($NewCart);
         $data = \Mktr\Model\Product::getProductFromCartData($NewCart);
 
-        if (isset($cart['product_data'][$_id]['amount'])) {
-            $items = $cart['product_data'][$_id]['amount'];
-        } else if (isset($cart['products'][$_id]['amount'])) {
-            $items = $cart['products'][$_id]['amount'];
-        } else {
-            $items = 1;
-        }
+        $qty = abs($cart['products'][$_id]['amount']-$cart['products'][$_id]['amount_total']);
 
-        Mktr\Helper\Session::addToCart($data['pId'], $data['pAttr'], $items);
+        Mktr\Helper\Session::addToCart($data['pId'], $data['pAttr'], $qty);
         Mktr\Helper\Session::save();
     }
 }
 
 function fn_mktr_delete_cart_product($cart, $_id, $full_erase)
 {
-    if (Mktr::$doEvent) {
+    if (Mktr::$doEvent && $cart['products'][$_id]['price'] > 0) {
         Mktr::$doEvent = false;
         Mktr::i();
         $NewCart = $cart['products'][$_id];
         $NewCart['product_features'] = fn_mktr_add_features($NewCart);
         $data = \Mktr\Model\Product::getProductFromCartData($NewCart);
         
-        if (isset($cart['product_data'][$_id]['amount'])) {
-            $items = $cart['product_data'][$_id]['amount'];
-        } else if (isset($cart['products'][$_id]['amount'])) {
-            $items = $cart['products'][$_id]['amount'];
-        } else {
-            $items = 1;
-        }
+        $qty = $cart['products'][$_id]['amount'];
 
-        Mktr\Helper\Session::removeFromCart($data['pId'], $data['pAttr'], $items);
+        Mktr\Helper\Session::removeFromCart($data['pId'], $data['pAttr'], $qty);
         Mktr\Helper\Session::save();
     }
 }
+
 function fn_mktr_pre_add_to_wishlist($product_data, $wishlist, $auth)
 {
     if (Mktr::$doEvent) {
