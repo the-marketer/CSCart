@@ -61,7 +61,6 @@ class Route
         'clearevents' => 'js',
         'setemail' => 'js',
         'saveorder' => 'js',
-        'test' => 'js',
     ];
 
     private static $Route = [
@@ -77,7 +76,6 @@ class Route
         'setemail' => 'setEmail', // ToDo
         'saveorder' => 'saveOrder',
         'refreshjs' => 'refreshJS',
-        'test' => 'Test',
     ];
 
     public static $page_tree = [
