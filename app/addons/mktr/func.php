@@ -1,6 +1,6 @@
 <?php
 /**
- * @author      Alexandru Buzica (EAX LEX S.R.L.) <b.alex@eax.ro>
+ * @author      theMarketer
  * @copyright   Copyright (c) 2023 TheMarketer.com
  * @license     https://opensource.org/licenses/osl-3.0.php - Open Software License (OSL 3.0)
  * @project     TheMarketer.com
@@ -24,7 +24,7 @@ if (!defined('MKTR_CRON')) {
     define('MKTR_CRON', false);
 }
 if (!defined('MKTR_VERSION')) {
-    define('MKTR_VERSION', 'v1.0.4');
+    define('MKTR_VERSION', 'v1.0.5');
 }
 if (!function_exists('dd')) {
     function dd()
@@ -58,7 +58,7 @@ class Mktr
     public static $isApi = false;
     public static $ApiPath = null;
     public static $loadJSData = true;
-    public static $VERSION = "1.0.4.3";
+    public static $VERSION = "1.0.5";
     public static $doEvent = true;
 
     public function __construct()
