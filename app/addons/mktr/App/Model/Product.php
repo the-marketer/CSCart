@@ -155,6 +155,8 @@ class Product extends DataBase
             'page' => $num,
             'status' => 'A',
             'use_caching' => false,
+            // Only feed-eligible products (price > 0 and main image) are paginated, see fn_mktr_get_products
+            'mktr_feed' => true,
             // 'storefront' => \Mktr\Model\Config::shop(),
             // 'area' => 'C',
             // 'custom_extend' => [ 'product_id', 'product_name' ]

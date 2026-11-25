@@ -22,5 +22,6 @@ fn_register_hooks(
     'newsletters_update_subscriptions_post',
     'login_user_post',
     'api_handle_request',
-    'api_check_access'
+    'api_check_access',
+    'get_products'
 );
