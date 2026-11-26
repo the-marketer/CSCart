@@ -15,33 +15,37 @@ use Mktr\Model\Product;
 
 class Feed
 {
+    /**
+     * With &page=N: only that page. Without it: every page, until the first empty one.
+     * Pages only contain feed-eligible products (see Product::feedEligibilitySql).
+     */
     public static function run()
     {
-        $data = [];
-        $stop = false;
         $page = Valid::getParam('page', null);
         $limit = Valid::getParam('limit', null);
 
+        $data = [];
+
         if ($page !== null) {
-            $stop = true;
+            self::exportRows(Product::getPage($page, $limit), $data);
+
+            return $data;
         }
 
-        $currentPage = $page === null ? 1 : $page;
-
-        do {
-            $cPage = Product::getPage($currentPage, $limit);
-            $pages = $stop ? 0 : count($cPage);
-
-            foreach ($cPage as $val) {
-                $prod = Product::getByID($val['product_id'], true);
-                if ($prod->sale_price > 0 && $prod->main_image != null) {
-                    $data[] = $prod->toArray();
-                }
-            }
-
-            ++$currentPage;
-        } while (0 < $pages);
+        for ($currentPage = 1; $rows = Product::getPage($currentPage, $limit); ++$currentPage) {
+            self::exportRows($rows, $data);
+        }
 
         return $data;
+    }
+
+    private static function exportRows(array $rows, array &$data)
+    {
+        foreach ($rows as $row) {
+            $prod = Product::getByID($row['product_id'], true);
+            if ($prod->isFeedEligible()) {
+                $data[] = $prod->toArray();
+            }
+        }
     }
 }

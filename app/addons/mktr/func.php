@@ -202,6 +202,18 @@ function fn_mktr_api_check_access($CSCart = null, $entity = null, $method_name =
         $can_access = true;
     }
 }
+/**
+ * Hook: only the feed's own query (flagged by Product::getPage) is narrowed to feed-eligible products.
+ * Every other product listing passes through untouched.
+ */
+function fn_mktr_get_products($params, $fields, $sortings, &$condition, $join, $sorting, $group_by, $lang_code, $having)
+{
+    Mktr::i(); // registers the addon autoloader; this hook also runs outside the addon's own routes
+
+    if (!empty($params[\Mktr\Model\Product::FEED_QUERY_FLAG])) {
+        $condition .= \Mktr\Model\Product::feedEligibilitySql();
+    }
+}
 function fn_mktr_install()
 {
     Mktr::i();

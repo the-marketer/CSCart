@@ -116,6 +116,9 @@ class Product extends DataBase
 
     const TYPE_COMBINATION = 'combinations';
 
+    /** fn_get_products() param that marks the feed's query, so the get_products hook only touches it */
+    const FEED_QUERY_FLAG = 'mktr_feed';
+
     public static function i()
     {
         if (self::$i === null) {
@@ -155,6 +158,8 @@ class Product extends DataBase
             'page' => $num,
             'status' => 'A',
             'use_caching' => false,
+            // Paginate over feed-eligible products only (see feedEligibilitySql / fn_mktr_get_products)
+            self::FEED_QUERY_FLAG => true,
             // 'storefront' => \Mktr\Model\Config::shop(),
             // 'area' => 'C',
             // 'custom_extend' => [ 'product_id', 'product_name' ]
@@ -169,6 +174,38 @@ class Product extends DataBase
         }
 
         return [];
+    }
+
+    /*
+     * Feed eligibility: a product is exported only if it has a main (detailed) image and a price > 0.
+     *
+     * The rule exists in two forms that must be kept in sync:
+     *  - feedEligibilitySql(): applied in SQL, BEFORE pagination, so &page/&limit never yield
+     *    empty pages in the middle of the feed (theMarketer stops importing at the first empty page);
+     *  - isFeedEligible(): the same rule on the fully loaded product, as a safety net for what SQL
+     *    can't see (e.g. a promotion bringing the price to 0).
+     *
+     * Price means the base price (USERGROUP_ALL, qty 1). A product with base price 0 is NOT exported,
+     * even if it has a list price.
+     */
+    public static function feedEligibilitySql()
+    {
+        return db_quote(
+            ' AND EXISTS (SELECT 1 FROM ?:images_links AS mktr_il'
+            . ' INNER JOIN ?:images AS mktr_img ON mktr_img.image_id = mktr_il.detailed_id'
+            . ' WHERE mktr_il.object_id = products.product_id AND mktr_il.object_type = ?s AND mktr_il.type = ?s)'
+            . ' AND EXISTS (SELECT 1 FROM ?:product_prices AS mktr_pp'
+            . ' WHERE mktr_pp.product_id = products.product_id AND mktr_pp.lower_limit = 1'
+            . ' AND mktr_pp.usergroup_id = ?i AND mktr_pp.price > 0)',
+            'product',
+            'M',
+            USERGROUP_ALL
+        );
+    }
+
+    public function isFeedEligible()
+    {
+        return $this->sale_price > 0 && $this->main_image != null;
     }
 
     public static function getByIDNoParent($id)
