@@ -203,29 +203,16 @@ function fn_mktr_api_check_access($CSCart = null, $entity = null, $method_name =
     }
 }
 /**
- * Restricts the feed query to products the feed can actually export (main image + price > 0),
- * so pagination (&page / &limit) never yields empty pages in the middle of the feed.
+ * Hook: only the feed's own query (flagged by Product::getPage) is narrowed to feed-eligible products.
+ * Every other product listing passes through untouched.
  */
 function fn_mktr_get_products($params, $fields, $sortings, &$condition, $join, $sorting, $group_by, $lang_code, $having)
 {
-    if (empty($params['mktr_feed'])) {
-        return;
+    Mktr::i(); // registers the addon autoloader; this hook also runs outside the addon's own routes
+
+    if (!empty($params[\Mktr\Model\Product::FEED_QUERY_FLAG])) {
+        $condition .= \Mktr\Model\Product::feedEligibilitySql();
     }
-
-    $condition .= db_quote(
-        ' AND EXISTS (SELECT 1 FROM ?:images_links AS mktr_il'
-        . ' INNER JOIN ?:images AS mktr_img ON mktr_img.image_id = mktr_il.detailed_id'
-        . ' WHERE mktr_il.object_id = products.product_id AND mktr_il.object_type = ?s AND mktr_il.type = ?s)',
-        'product',
-        'M'
-    );
-
-    $condition .= db_quote(
-        ' AND EXISTS (SELECT 1 FROM ?:product_prices AS mktr_pp'
-        . ' WHERE mktr_pp.product_id = products.product_id AND mktr_pp.lower_limit = 1'
-        . ' AND mktr_pp.usergroup_id = ?i AND mktr_pp.price > 0)',
-        USERGROUP_ALL
-    );
 }
 function fn_mktr_install()
 {
